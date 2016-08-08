@@ -1,0 +1,151 @@
+package com.autopia4j.framework.webdriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.*;
+
+import com.autopia4j.framework.core.Settings;
+import com.autopia4j.framework.utils.FrameworkException;
+
+
+/**
+ * Factory class for creating the {@link WebDriver} object as required
+ * @author vj
+ */
+public class PerfectoWebDriverFactory {
+	private static Properties properties;
+	
+	private PerfectoWebDriverFactory() {
+		// To prevent external instantiation of this class
+	}
+	
+	
+	/**
+	 * Function to return the Perfecto MobileCloud {@link RemoteWebDriver} object based on the parameters passed
+	 * @param deviceId The ID of the Perfecto MobileCloud device to be used for the test execution
+	 * @param deviceType The {@link DeviceType} corresponding to the Device ID passed as input
+	 * @param browser The {@link Browser} to be used for the test execution
+	 * @param remoteUrl The Perfecto MobileCloud URL to be used for the test execution
+	 * @return The corresponding {@link RemoteWebDriver} object
+	 */
+	public static WebDriver getPerfectoRemoteWebDriver(String deviceId,
+								DeviceType deviceType, Browser browser, String remoteUrl) {
+		DesiredCapabilities desiredCapabilities = getPerfectoExecutionCapabilities(browser);
+		desiredCapabilities.setCapability("deviceName", deviceId);
+		
+		URL url = getUrl(remoteUrl);
+		RemoteWebDriver driver = new RemoteWebDriver(url, desiredCapabilities);
+		
+		Map<String, Object> params = new HashMap<>();
+		params.put("method", "device");
+		//params.put("method", "view");
+		String orientation = getOrientation(deviceType);
+		params.put("state", orientation);
+		driver.executeScript("mobile:handset:rotate", params);
+		
+		return driver;
+	}
+	
+	private static URL getUrl(String remoteUrl) {
+		URL url;
+		try {
+			url = new URL(remoteUrl);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			throw new FrameworkException("The specified remote URL is malformed");
+		}
+		return url;
+	}
+	
+	private static DesiredCapabilities getPerfectoExecutionCapabilities(Browser browser) {
+		validatePerfectoSupports(browser);
+		
+		DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+		desiredCapabilities.setBrowserName(browser.getValue());
+		desiredCapabilities.setPlatform(Platform.ANY);
+		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
+		
+		properties = Settings.getInstance();
+		
+		boolean acceptAllSslCertificates =
+				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
+		
+		desiredCapabilities.setCapability("user", properties.getProperty("PerfectoUser"));
+		desiredCapabilities.setCapability("password", properties.getProperty("PerfectoPassword"));
+		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
+		
+		return desiredCapabilities;
+	}
+	
+	private static void validatePerfectoSupports(Browser browser) {
+		switch (browser) {
+		case INTERNET_EXPLORER:
+		case FIREFOX:
+		case HTML_UNIT:
+		case OPERA:
+			throw new FrameworkException("The browser " + browser.toString() +
+											" is not supported on the Perfecto MobileCloud");
+			
+		default:
+			break;
+		}
+	}
+	
+	private static String getOrientation(DeviceType deviceType) {
+		switch (deviceType) {
+		case MOBILE_PORTRAIT:
+		case TABLET_PORTRAIT:
+			return "portrait";
+			
+		case MOBILE_LANDSCAPE:
+		case TABLET_LANDSCAPE:
+			return "landscape";
+		default:
+			return "landscape";
+		}
+	}
+	
+	/**
+	 * Function to return the Perfecto MobileCloud {@link RemoteWebDriver} object based on the parameters passed
+	 * @param platformName The device platform to be used for the test execution (iOS, Android, etc.)
+	 * @param platformVersion The device platform version to be used for the test execution
+	 * @param browser The {@link Browser} to be used for the test execution
+	 * @param remoteUrl The Perfecto MobileCloud URL to be used for the test execution
+	 * @return The corresponding {@link RemoteWebDriver} object
+	 */
+	public static WebDriver getPerfectoRemoteWebDriverByDevicePlatform(String platformName,
+								String platformVersion, Browser browser, String remoteUrl) {
+		DesiredCapabilities desiredCapabilities = getPerfectoExecutionCapabilities(browser);
+		desiredCapabilities.setCapability("platformName", platformName);
+		desiredCapabilities.setCapability("platformVersion", platformVersion);
+		
+		URL url = getUrl(remoteUrl);
+		
+		return new RemoteWebDriver(url, desiredCapabilities);
+	}
+	
+	/**
+	 * Function to return the Perfecto MobileCloud {@link RemoteWebDriver} object based on the parameters passed
+	 * @param manufacturer The manufacturer of the device to be used for the test execution (Samsung, Apple, etc.)
+	 * @param model The device model to be used for the test execution (Galaxy S6, iPad Air, etc.)
+	 * @param browser The {@link Browser} to be used for the test execution
+	 * @param remoteUrl The Perfecto MobileCloud URL to be used for the test execution
+	 * @return The corresponding {@link RemoteWebDriver} object
+	 */
+	public static WebDriver getPerfectoRemoteWebDriverByDeviceModel(String manufacturer,
+										String model, Browser browser, String remoteUrl) {
+		DesiredCapabilities desiredCapabilities = getPerfectoExecutionCapabilities(browser);
+		desiredCapabilities.setCapability("manufacturer", manufacturer);
+		desiredCapabilities.setCapability("model", model);
+		
+		URL url = getUrl(remoteUrl);
+		
+		return new RemoteWebDriver(url, desiredCapabilities);
+	}
+}

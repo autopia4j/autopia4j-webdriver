@@ -200,7 +200,7 @@ public abstract class DriverScript {
 			break;
 			
 		case PERFECTO_REMOTEWEBDRIVER:
-			driver = WebDriverFactory.getPerfectoRemoteWebDriver(testParameters.getPerfectoDeviceId(),
+			driver = PerfectoWebDriverFactory.getPerfectoRemoteWebDriver(testParameters.getPerfectoDeviceId(),
 																testParameters.getDeviceType(),
 																testParameters.getBrowser(),
 																properties.getProperty("PerfectoHost"));
