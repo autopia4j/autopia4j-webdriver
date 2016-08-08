@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.modular;
+package com.autopia4j.framework.webdriver.impl.modular;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,9 @@ import com.autopia4j.framework.datatable.impl.ModularDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.*;
+import com.autopia4j.framework.webdriver.core.DriverScript;
+import com.autopia4j.framework.webdriver.core.ScriptHelper;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 import org.apache.commons.io.FileUtils;
 
@@ -17,7 +19,7 @@ import org.apache.commons.io.FileUtils;
  * @author vj
  */
 public class ModularDriverScript extends DriverScript {
-	private TestCase testCase;
+	private TestScript testCase;
 	
 	
 	/**
@@ -32,9 +34,9 @@ public class ModularDriverScript extends DriverScript {
 	/**
 	 * DriverScript constructor
 	 * @param testParameters A {@link WebDriverTestParameters} object
-	 * @param testCase A {@link TestCase} object
+	 * @param testCase A {@link TestScript} object
 	 */
-	public ModularDriverScript(WebDriverTestParameters testParameters, TestCase testCase) {
+	public ModularDriverScript(WebDriverTestParameters testParameters, TestScript testCase) {
 		super(testParameters);
 		this.testCase = testCase;
 	}
@@ -133,7 +135,7 @@ public class ModularDriverScript extends DriverScript {
 		testCase.initialize(scriptHelper);
 	}
 	
-	private TestCase getTestCaseInstance() {
+	private TestScript getTestCaseInstance() {
 		Class<?> testScriptClass;
 		try {
 			testScriptClass = Class.forName(frameworkParameters.getBasePackageName() +
@@ -147,7 +149,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 		
 		try {
-			return (TestCase) testScriptClass.newInstance();
+			return (TestScript) testScriptClass.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FrameworkException("Error while instantiating the specified test script");

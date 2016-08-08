@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.modular;
+package com.autopia4j.framework.webdriver.impl.modular;
 
 import java.util.Properties;
 
@@ -14,14 +14,20 @@ import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.datatable.DataTableType;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.*;
+import com.autopia4j.framework.webdriver.core.DeviceType;
+import com.autopia4j.framework.webdriver.core.ScriptHelper;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
+import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
+import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
+import com.autopia4j.framework.webdriver.utils.GalenUtil;
+import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
 
 
 /**
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class TestCase {
+public abstract class TestScript {
 	
 	private ResultSummaryManager resultSummaryManager =
 										ResultSummaryManager.getInstance();

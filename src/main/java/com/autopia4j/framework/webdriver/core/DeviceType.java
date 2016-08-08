@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.core;
 
 /**
  * Enumeration to represent the type of device on which a test is executed

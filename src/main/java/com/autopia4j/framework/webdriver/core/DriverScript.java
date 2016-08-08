@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.core;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,6 +21,12 @@ import com.autopia4j.framework.reporting.Status;
 import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.mobile.AppiumWebDriverFactory;
+import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverFactory;
+import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverUtil;
+import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
+import com.autopia4j.framework.webdriver.utils.GalenUtil;
+import com.autopia4j.framework.webdriver.utils.WebDriverFactory;
 
 public abstract class DriverScript {
 	

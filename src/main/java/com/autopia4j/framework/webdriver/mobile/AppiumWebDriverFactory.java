@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.mobile;
 
 import java.net.URL;
 import org.openqa.selenium.Platform;
@@ -8,6 +8,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.webdriver.core.Browser;
+
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;

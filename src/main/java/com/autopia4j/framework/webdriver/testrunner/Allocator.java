@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.testrunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,11 @@ import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.ExcelDataAccess;
+import com.autopia4j.framework.webdriver.core.Browser;
+import com.autopia4j.framework.webdriver.core.DeviceType;
+import com.autopia4j.framework.webdriver.core.ExecutionMode;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
+import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 
 
 /**

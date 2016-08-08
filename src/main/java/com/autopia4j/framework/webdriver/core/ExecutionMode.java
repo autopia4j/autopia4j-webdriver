@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.core;
 
 import org.openqa.selenium.remote.RemoteWebDriver;
 

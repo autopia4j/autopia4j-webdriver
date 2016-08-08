@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.core;
 
 /**
  * Enumeration to represent the browser to be used for execution

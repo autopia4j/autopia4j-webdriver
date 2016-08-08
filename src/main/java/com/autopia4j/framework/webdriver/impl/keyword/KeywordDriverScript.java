@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.keyword;
+package com.autopia4j.framework.webdriver.impl.keyword;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,10 @@ import com.autopia4j.framework.datatable.impl.KeywordDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.*;
+import com.autopia4j.framework.webdriver.core.DriverScript;
+import com.autopia4j.framework.webdriver.core.ReusableLibrary;
+import com.autopia4j.framework.webdriver.core.ScriptHelper;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 

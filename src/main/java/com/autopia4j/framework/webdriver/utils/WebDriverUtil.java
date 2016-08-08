@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.utils;
 
 import java.util.List;
 import java.util.Random;

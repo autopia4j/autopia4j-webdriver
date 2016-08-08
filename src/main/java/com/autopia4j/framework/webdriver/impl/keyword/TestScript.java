@@ -1,11 +1,12 @@
-package com.autopia4j.framework.webdriver.keyword;
+package com.autopia4j.framework.webdriver.impl.keyword;
 
 import java.util.Properties;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.*;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
+import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -19,7 +20,7 @@ import org.testng.annotations.BeforeSuite;
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class TestCase {
+public abstract class TestScript {
 	/**
 	 * The current scenario
 	 */

@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.reporting;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,6 +19,7 @@ import com.autopia4j.framework.reporting.ReportThemeFactory;
 import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 
 /**

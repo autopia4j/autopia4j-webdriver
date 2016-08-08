@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.utils;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import org.openqa.selenium.remote.*;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.core.Browser;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
 

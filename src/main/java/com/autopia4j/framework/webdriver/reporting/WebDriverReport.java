@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.reporting;
 
 import java.io.File;
 import java.io.IOException;

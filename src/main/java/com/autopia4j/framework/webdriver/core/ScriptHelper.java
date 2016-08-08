@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.core;
 
 import java.util.Properties;
 
@@ -6,11 +6,10 @@ import org.openqa.selenium.WebDriver;
 
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.datatable.DataTableType;
-import com.autopia4j.framework.webdriver.DeviceType;
-import com.autopia4j.framework.webdriver.GalenUtil;
-import com.autopia4j.framework.webdriver.WebDriverReport;
-import com.autopia4j.framework.webdriver.WebDriverTestParameters;
-import com.autopia4j.framework.webdriver.WebDriverUtil;
+import com.autopia4j.framework.webdriver.core.DeviceType;
+import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
+import com.autopia4j.framework.webdriver.utils.GalenUtil;
+import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
 
 
 /**

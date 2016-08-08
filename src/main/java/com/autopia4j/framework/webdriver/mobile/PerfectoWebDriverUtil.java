@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.mobile;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,6 +14,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
 public class PerfectoWebDriverUtil {
 	

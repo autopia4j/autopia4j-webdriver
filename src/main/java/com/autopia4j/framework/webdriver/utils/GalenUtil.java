@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver;
+package com.autopia4j.framework.webdriver.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.Status;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.galenframework.api.Galen;
 import com.galenframework.api.GalenPageDump;
 import com.galenframework.reports.GalenTestInfo;
