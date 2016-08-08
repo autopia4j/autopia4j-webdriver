@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.autopia4j.framework</groupId>
+  <artifactId>autopia4j-webdriver</artifactId>
+  <version>1.0.0</version>
+  <name>autopia4j framework for webdriver</name>
+  <description>autopia4j framework for webdriver</description>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.galenframework</groupId>
+  		<artifactId>galen-java-support</artifactId>
+  		<version>2.3.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.seleniumhq.selenium</groupId>
+  		<artifactId>selenium-server</artifactId>
+  		<version>3.0.0-beta2</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.testng</groupId>
+  		<artifactId>testng</artifactId>
+  		<version>6.8</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.autopia4j.framework</groupId>
+  		<artifactId>autopia4j-core</artifactId>
+  		<version>1.0.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>io.github.lukehutch</groupId>
+  		<artifactId>fast-classpath-scanner</artifactId>
+  		<version>LATEST</version>
+  	</dependency>
+  </dependencies>
+  <properties>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+</project>

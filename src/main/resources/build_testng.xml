@@ -1,0 +1,51 @@
+<project name="HelloWorld" basedir="." default="main">
+	<property name="tests.gui.dir" value="H:\Vijay\Eclipse Workspace\CRAFT - Pru.com" />
+	<property name="testset.name" value="sanity" />
+	
+	<property name="javalibs.dir" value="H:\Javalibs" />
+	
+	<property name="build.dir" value="build" />
+	<property name="build.testreports.dir" value="${build.dir}\testreports" />
+	
+	<path id="lib.testng">
+		<fileset dir="${javalibs.dir}\testng" includes="testng-6.8.8.jar"/>
+	</path>
+	<taskdef resource="testngtasks" classpathref="lib.testng" />
+	
+	<target name="clean">
+		<echo message="Cleaning up old builds..." />
+		<delete dir="${build.dir}" />
+	</target>
+	
+	<!-- include project build and deploy code here if applicable -->
+	
+	<target name="selenium-ui-tests" depends="clean">
+		<mkdir dir="${build.testreports.dir}" />
+		<mkdir dir="${build.testreports.dir}\CRAFT" />
+		
+		<path id="libs.craft.selenium">
+			<pathelement location="${tests.gui.dir}" />
+			
+			<fileset dir="${javalibs.dir}\Selenium" includes="*.jar" />
+			<fileset dir="${javalibs.dir}\galen-bin-2.1.3" includes="*.jar" />
+			<fileset dir="${javalibs.dir}\poi-3.10.1" includes="poi-3.10.1-20140818.jar" />
+			<fileset dir="${javalibs.dir}\poi-3.10.1" includes="poi-ooxml-3.10.1-20140818.jar" />
+			<fileset dir="${javalibs.dir}\poi-3.10.1" includes="poi-ooxml-schemas-3.10.1-20140818.jar" />
+			<fileset dir="${javalibs.dir}\poi-3.10.1\ooxml-lib" includes="*.jar" />
+			<fileset dir="${tests.gui.dir}\supportlibraries" includes="*.jar" />
+		</path>
+		
+		<testng outputdir="${build.testreports.dir}"
+				workingdir="${tests.gui.dir}"
+				haltonfailure="true"
+				classpathref="libs.craft.selenium">
+			
+			<sysproperty key="ReportPath" 
+						value="${basedir}\${build.testreports.dir}\CRAFT"/>
+			
+			<xmlfileset dir="${tests.gui.dir}" includes="testng_${testset.name}.xml" />
+		</testng>
+	</target>
+	
+	<target name="main" depends="clean,selenium-ui-tests" />
+</project>
