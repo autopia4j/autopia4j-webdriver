@@ -1,6 +1,5 @@
 package com.autopia4j.framework.webdriver;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.utils.Util;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
 
@@ -281,20 +281,9 @@ public class WebDriverFactory {
 		
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		
 		return new RemoteWebDriver(url, desiredCapabilities);
-	}
-	
-	private static URL getUrl(String remoteUrl) {
-		URL url;
-		try {
-			url = new URL(remoteUrl);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw new FrameworkException("The specified remote URL is malformed");
-		}
-		return url;
 	}
 	
 	/**
@@ -344,7 +333,7 @@ public class WebDriverFactory {
 		DesiredCapabilities desiredCapabilities = getEmulatedChromeDriverCapabilities(deviceName);
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		
 		return new RemoteWebDriver(url, desiredCapabilities);
 	}
@@ -404,7 +393,7 @@ public class WebDriverFactory {
 													devicePixelRatio, userAgent);
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		
 		return new RemoteWebDriver(url, desiredCapabilities);
 	}

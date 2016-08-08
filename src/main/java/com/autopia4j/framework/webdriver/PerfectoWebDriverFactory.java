@@ -1,6 +1,5 @@
 package com.autopia4j.framework.webdriver;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.utils.Util;
 
 
 /**
@@ -39,7 +39,7 @@ public class PerfectoWebDriverFactory {
 		DesiredCapabilities desiredCapabilities = getPerfectoExecutionCapabilities(browser);
 		desiredCapabilities.setCapability("deviceName", deviceId);
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		RemoteWebDriver driver = new RemoteWebDriver(url, desiredCapabilities);
 		
 		Map<String, Object> params = new HashMap<>();
@@ -50,17 +50,6 @@ public class PerfectoWebDriverFactory {
 		driver.executeScript("mobile:handset:rotate", params);
 		
 		return driver;
-	}
-	
-	private static URL getUrl(String remoteUrl) {
-		URL url;
-		try {
-			url = new URL(remoteUrl);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			throw new FrameworkException("The specified remote URL is malformed");
-		}
-		return url;
 	}
 	
 	private static DesiredCapabilities getPerfectoExecutionCapabilities(Browser browser) {
@@ -125,7 +114,7 @@ public class PerfectoWebDriverFactory {
 		desiredCapabilities.setCapability("platformName", platformName);
 		desiredCapabilities.setCapability("platformVersion", platformVersion);
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		
 		return new RemoteWebDriver(url, desiredCapabilities);
 	}
@@ -144,7 +133,7 @@ public class PerfectoWebDriverFactory {
 		desiredCapabilities.setCapability("manufacturer", manufacturer);
 		desiredCapabilities.setCapability("model", model);
 		
-		URL url = getUrl(remoteUrl);
+		URL url = Util.getUrl(remoteUrl);
 		
 		return new RemoteWebDriver(url, desiredCapabilities);
 	}
