@@ -33,22 +33,20 @@ public class ScriptHelper {
 	 * @param dataTable The {@link DataTableType} object
 	 * @param report The {@link WebDriverReport} object
 	 * @param driver The {@link WebDriver} object
-	 * @param driverUtil The {@link WebDriverUtil} object
-	 * @param galenUtil The {@link GalenUtil} object
 	 */
 	public ScriptHelper(WebDriverTestParameters testParameters, DataTableType dataTable,
-						WebDriverReport report, WebDriver driver,
-						WebDriverUtil driverUtil, GalenUtil galenUtil) {
+						WebDriverReport report, WebDriver driver) {
 		this.deviceType = testParameters.getDeviceType();
 		this.dataTable = dataTable;
 		this.report = report;
 		this.driver = driver;
-		this.driverUtil = driverUtil;
-		this.galenUtil = galenUtil;
 		
 		Properties properties = Settings.getInstance();
 		objectSyncTimeout = Long.parseLong(properties.get("ObjectSyncTimeout").toString());
 		pageLoadTimeout = Long.parseLong(properties.get("PageLoadTimeout").toString());
+		
+		driverUtil = new WebDriverUtil(driver, objectSyncTimeout, pageLoadTimeout);
+		galenUtil = new GalenUtil(driver, report);
 	}
 	
 	/**

@@ -10,8 +10,10 @@ import org.openqa.selenium.WebDriver;
 
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.Status;
+import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.galenframework.api.Galen;
+import com.galenframework.api.GalenPageDump;
 import com.galenframework.reports.GalenTestInfo;
 import com.galenframework.reports.HtmlReportBuilder;
 import com.galenframework.reports.TestReport;
@@ -23,9 +25,9 @@ import com.galenframework.reports.model.LayoutReport;
  * @author vj
  */
 public class GalenUtil {
-	private WebDriver driver;
-	private WebDriverReport report;
-	private ReportSettings reportSettings;
+	private final WebDriver driver;
+	private final WebDriverReport report;
+	private final ReportSettings reportSettings;
 	private List<GalenTestInfo> galenTests;
 	
 	
@@ -33,12 +35,11 @@ public class GalenUtil {
 	 * Constructor to initialize the {@link GalenUtil} object
 	 * @param driver The {@link WebDriver} object
 	 * @param report The {@link WebDriverReport} object
-	 * @param reportSettings The {@link ReportSettings} object
 	 */
-	public GalenUtil(WebDriver driver, WebDriverReport report, ReportSettings reportSettings) {
+	public GalenUtil(WebDriver driver, WebDriverReport report) {
 		this.driver = driver;
 		this.report = report;
-		this.reportSettings = reportSettings;
+		this.reportSettings = report.getReportSettings();
 		
 		galenTests = new LinkedList<GalenTestInfo>();
 	}
@@ -79,6 +80,22 @@ public class GalenUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			report.updateTestLog("Galen Test", reportTitle + ". An error occured!", Status.FAIL);
+		}
+	}
+	
+	/**
+	 * Function to create a page dump
+	 * @param pageName The name of the page
+	 * @param specFilePath The path of the spec file
+	 * @param dumpPath The path where the page dump should be stored
+	 */
+	public void dumpCurrentPage(String pageName, String specFilePath, String dumpPath) {
+		GalenPageDump pageDump = new GalenPageDump(pageName);
+		try {
+			pageDump.dumpPage(driver, specFilePath, dumpPath);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new FrameworkException(e.getMessage());
 		}
 	}
 	

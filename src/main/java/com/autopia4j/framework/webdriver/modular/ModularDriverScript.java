@@ -64,11 +64,6 @@ public class ModularDriverScript extends DriverScript {
 	}
 	
 	protected int getNumberOfIterations() {
-		String datatablePath = frameworkParameters.getBasePath() +
-								Util.getFileSeparator() + "src" +
-								Util.getFileSeparator() + "test" +
-								Util.getFileSeparator() + "resources" +
-								Util.getFileSeparator() + "datatables";
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
 		testDataAccess.setDatasheetName(properties.getProperty("DefaultDataSheet"));
@@ -76,12 +71,6 @@ public class ModularDriverScript extends DriverScript {
 	}
 	
 	private void initializeDatatable() {
-		String datatablePath = frameworkParameters.getBasePath() +
-								Util.getFileSeparator() + "src" +
-								Util.getFileSeparator() + "test" +
-								Util.getFileSeparator() + "resources" +
-								Util.getFileSeparator() + "datatables";
-		
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
 				Boolean.parseBoolean(properties.getProperty("IncludeTestDataInReport"));
@@ -136,10 +125,7 @@ public class ModularDriverScript extends DriverScript {
 	}
 	
 	private void initializeTestCase() {
-		driverUtil = new WebDriverUtil(driver, report);
-		galenUtil = new GalenUtil(driver, report, reportSettings);
-		scriptHelper = new ScriptHelper(testParameters, dataTable,
-												report, driver, driverUtil, galenUtil);
+		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
 		if(testCase == null) {
 			testCase = getTestCaseInstance();

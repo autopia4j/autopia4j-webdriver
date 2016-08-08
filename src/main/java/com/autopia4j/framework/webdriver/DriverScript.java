@@ -1,22 +1,13 @@
 package com.autopia4j.framework.webdriver;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.OnError;
@@ -42,8 +33,6 @@ public abstract class DriverScript {
 	protected ReportSettings reportSettings;
 	protected WebDriverReport report;
 	protected WebDriver driver;
-	protected WebDriverUtil driverUtil;
-	protected GalenUtil galenUtil;
 	protected ScriptHelper scriptHelper;
 	
 	protected Properties properties;
@@ -53,7 +42,7 @@ public abstract class DriverScript {
 	private Boolean linkScreenshotsToTestLog = true;
 	
 	protected final WebDriverTestParameters testParameters;
-	protected String reportPath;
+	protected String datatablePath, reportPath;
 	
 	
 	/**
@@ -113,6 +102,12 @@ public abstract class DriverScript {
 		startTime = Util.getCurrentTime();
 		
 		properties = Settings.getInstance();
+		
+		datatablePath = frameworkParameters.getBasePath() +
+							Util.getFileSeparator() + "src" +
+							Util.getFileSeparator() + "test" +
+							Util.getFileSeparator() + "resources" +
+							Util.getFileSeparator() + "datatables";
 		
 		setDefaultTestParameters();
 	}
@@ -228,7 +223,10 @@ public abstract class DriverScript {
 				Long.parseLong(properties.get("PageLoadTimeout").toString());
 		driver.manage().timeouts().implicitlyWait(objectSyncTimeout, TimeUnit.SECONDS);
 		driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
-		driver.manage().window().maximize();
+		
+		if(testParameters.getDeviceType().getValue().contains("desktop")) {
+			driver.manage().window().maximize();
+		}
 	}
 	
 	protected void initializeTestReport() {
@@ -363,7 +361,7 @@ public abstract class DriverScript {
 		} else {
 			OnError onError = OnError.valueOf(properties.getProperty("OnError"));
 			switch(onError) {
-			// Stop option is not relevant when run from QC
+			// Stop option is not relevant when run from HP ALM
 			case NEXT_ITERATION:
 				report.updateTestLog("Framework Info",
 						"Test case iteration terminated by user! Proceeding to next iteration (if applicable)...",
@@ -395,7 +393,8 @@ public abstract class DriverScript {
 		report.addTestLogSubSection("CloseBrowser");
 		
 		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_DEVICE) {
-			downloadPerfectoResults();
+			PerfectoWebDriverUtil perfectoWebDriverUtil = new PerfectoWebDriverUtil(driver, report);
+			perfectoWebDriverUtil.downloadPerfectoResults();
 		}
 		
 		try {
@@ -406,100 +405,13 @@ public abstract class DriverScript {
 		}
 	}
 	
-	private void downloadPerfectoResults() {
-		Boolean perfectoHtmlReport =
-					Boolean.parseBoolean(properties.getProperty("PerfectoHtmlReport"));
-		Boolean perfectoPdfReport =
-					Boolean.parseBoolean(properties.getProperty("PerfectoPdfReport"));
-		Boolean perfectoVideoDownload =
-					Boolean.parseBoolean(properties.getProperty("PerfectoVideoDownload"));
-		
-		File perfectoResultsFolder = null;
-		if (perfectoHtmlReport | perfectoPdfReport | perfectoVideoDownload) {
-			driver.close();
-			perfectoResultsFolder = report.createResultsSubFolder("Perfecto Results");
-		}
-		if (perfectoHtmlReport) {
-			downloadPerfectoReport("html", perfectoResultsFolder.getAbsolutePath());
-		}
-		if (perfectoPdfReport) {
-			downloadPerfectoReport("pdf", perfectoResultsFolder.getAbsolutePath());
-		}
-		if (perfectoVideoDownload) {
-			downloadPerfectoAttachment("video", "flv", perfectoResultsFolder.getAbsolutePath());
-		}
-	}
-	
-	/**
-	 * Function to download the execution result from Perfecto
-	 * @param reportType Specify any one format from "pdf", "html", "csv" or "xml"
-	 * @param reportPath The path at which the report should be saved
-	 */
-	private void downloadPerfectoReport(String reportType, String reportPath) {
-		String command = "mobile:report:download";
-		Map<String, Object> params = new HashMap<>();
-		params.put("type", reportType);
-		String reportRawData = (String) ((RemoteWebDriver) driver).executeScript(command, params);
-		
-		try {
-			File reportFile = new File(reportPath + Util.getFileSeparator() +
-									reportSettings.getReportName() + "." + reportType);
-			BufferedOutputStream outputStream =
-							new BufferedOutputStream(new FileOutputStream(reportFile));
-			byte[] reportBytes = OutputType.BYTES.convertFromBase64Png(reportRawData);
-			outputStream.write(reportBytes);
-			outputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new FrameworkException("Error occurred while downloading Perfecto report");
-		}
-	}
-	
-	/**
-	* Function to download all the report attachments of the specified type
-	* @param attachmentType Specify one from "video", "image", "vital" or "network"
-	* @param fileExtension The extension of the attachment files to be saved
-	* @param reportPath The path at which the report should be saved
-	*/
-	private void downloadPerfectoAttachment(String attachmentType, String fileExtension, String reportPath) {
-		String command = "mobile:report:attachment";
-		int index = 0;
-		String attachmentRawData;
-		
-		while(true) {
-			Map<String, Object> params = new HashMap<>();
-		    params.put("type", attachmentType);
-		    params.put("index", Integer.toString(index));
-		    attachmentRawData =
-		    		(String) ((RemoteWebDriver) driver).executeScript(command, params);
-		    
-		    if (attachmentRawData == null) {
-		    	break;
-		    }
-		    
-		    try {
-				File attachmentFile = new File(reportPath + Util.getFileSeparator() +
-											reportSettings.getReportName() + "_" +
-											attachmentType + index + "." + fileExtension);
-				BufferedOutputStream outputStream =
-						new BufferedOutputStream(new FileOutputStream(attachmentFile)); 
-				byte[] bytes = OutputType.BYTES.convertFromBase64Png(attachmentRawData);
-				outputStream.write(bytes);
-				outputStream.close();
-				index ++;
-	    	} catch (IOException e) {
-				e.printStackTrace();
-				throw new FrameworkException("Error occurred while downloading Perfecto attachment");
-			}
-		}
-	}
-	
 	protected void wrapUp() {
 		endTime = Util.getCurrentTime();
 		closeTestReport();
 	}
 	
 	private void closeTestReport() {
+		GalenUtil galenUtil = scriptHelper.getGalenUtil();
 		galenUtil.exportGalenReports();
 		
 		if (reportSettings.shouldConsolidateScreenshotsInWordDoc()) {
