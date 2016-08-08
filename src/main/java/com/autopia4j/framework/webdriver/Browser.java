@@ -5,6 +5,9 @@ package com.autopia4j.framework.webdriver;
  * @author vj
  */
 public enum Browser {
+	APPIUM_CHROME("Chrome"),
+	APPIUM_DEFAULT("Browser"),
+	APPIUM_SAFARI("Safari"),
 	CHROME("chrome"),
 	EDGE("edge"),
 	FIREFOX("firefox"),

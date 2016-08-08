@@ -35,10 +35,10 @@ public enum ExecutionMode {
 	/**
 	 * Execute on a Perfecto MobileCloud device using {@link RemoteWebDriver}
 	 */
-	PERFECTO_REMOTEWEBDRIVER;
+	PERFECTO_DEVICE,
 	
 	/**
 	 * Execute on a mobile device using Appium
 	 */
-	//APPIUM;
+	APPIUM_DEVICE;
 }

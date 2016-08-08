@@ -35,12 +35,11 @@ public class PerfectoWebDriverFactory {
 	 * @return The corresponding {@link RemoteWebDriver} object
 	 */
 	public static WebDriver getPerfectoRemoteWebDriver(String deviceId,
-								DeviceType deviceType, Browser browser, String remoteUrl) {
+								DeviceType deviceType, Browser browser, URL remoteUrl) {
 		DesiredCapabilities desiredCapabilities = getPerfectoExecutionCapabilities(browser);
 		desiredCapabilities.setCapability("deviceName", deviceId);
 		
-		URL url = Util.getUrl(remoteUrl);
-		RemoteWebDriver driver = new RemoteWebDriver(url, desiredCapabilities);
+		RemoteWebDriver driver = new RemoteWebDriver(remoteUrl, desiredCapabilities);
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("method", "device");

@@ -127,7 +127,7 @@ public abstract class DriverScript {
 		}
 		
 		if (testParameters.getDeviceName() == null) {
-			testParameters.setDeviceName(properties.getProperty("DefaultDevice"));
+			testParameters.setDeviceName(properties.getProperty("DefaultDeviceName"));
 		}
 		
 		if (testParameters.getBrowser() == null) {
@@ -140,6 +140,10 @@ public abstract class DriverScript {
 		
 		if (testParameters.getDeviceType() == null) {
 			testParameters.setDeviceType(DeviceType.valueOf(properties.getProperty("DefaultDeviceType")));
+		}
+		
+		if(testParameters.getRemoteUrl() == null) {
+			testParameters.setRemoteUrl(properties.getProperty("DefaultRemoteUrl"));
 		}
 	}
 	
@@ -178,7 +182,7 @@ public abstract class DriverScript {
 			
 		case REMOTE:
 			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
-													properties.getProperty("RemoteUrl"));
+															testParameters.getRemoteUrl());
 			break;
 			
 		case LOCAL_EMULATED_DEVICE:
@@ -189,21 +193,29 @@ public abstract class DriverScript {
 		case REMOTE_EMULATED_DEVICE:
 			testParameters.setBrowser(Browser.CHROME);	// Mobile emulation supported only on Chrome
 			driver = WebDriverFactory.getEmulatedRemoteWebDriver(testParameters.getDeviceName(), 
-													properties.getProperty("RemoteUrl"));
+																	testParameters.getRemoteUrl());
 			break;
 			
 		case GRID:
 			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
 													testParameters.getBrowserVersion(),
 													testParameters.getPlatform(),
-													properties.getProperty("RemoteUrl"));
+													testParameters.getRemoteUrl());
 			break;
 			
-		case PERFECTO_REMOTEWEBDRIVER:
+		case PERFECTO_DEVICE:
 			driver = PerfectoWebDriverFactory.getPerfectoRemoteWebDriver(testParameters.getPerfectoDeviceId(),
 																testParameters.getDeviceType(),
 																testParameters.getBrowser(),
-																properties.getProperty("PerfectoHost"));
+																testParameters.getRemoteUrl());
+			break;
+			
+		case APPIUM_DEVICE:
+			driver = AppiumWebDriverFactory.getAppiumWebDriver(testParameters.getDeviceName(),
+														testParameters.getScreenOrientation(),
+														testParameters.getBrowser(),
+														testParameters.getPlatform(),
+														testParameters.getRemoteUrl());
 			break;
 			
 		default:
@@ -277,7 +289,7 @@ public abstract class DriverScript {
 			
 		case REMOTE:
 			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Remote Machine @ " + properties.getProperty("RemoteUrl"));
+					"Executed on", ": " + "Remote Machine @ " + testParameters.getRemoteUrl());
 			break;
 			
 		case LOCAL_EMULATED_DEVICE:
@@ -288,21 +300,28 @@ public abstract class DriverScript {
 			
 		case REMOTE_EMULATED_DEVICE:
 			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Emulated Mobile Device on Remote Machine @ " + properties.getProperty("RemoteUrl"));
+					"Executed on", ": " + "Emulated Mobile Device on Remote Machine @ " + testParameters.getRemoteUrl());
 			report.addTestLogSubHeading("Emulated Device Name", ": " + testParameters.getDeviceName(), "", "");
 			break;
 			
 		case GRID:
 			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Grid @ " + properties.getProperty("RemoteUrl"));
+					"Executed on", ": " + "Grid @ " + testParameters.getRemoteUrl());
 			break;
 			
-		case PERFECTO_REMOTEWEBDRIVER:
+		case PERFECTO_DEVICE:
             report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
             		"Executed on", ": " + "Perfecto MobileCloud @ " + properties.getProperty("PerfectoHost")); 
             report.addTestLogSubHeading("Device Name/ID", ": " + testParameters.getDeviceName() +
             		" (" + testParameters.getPerfectoDeviceId() + ")",
             		"Perfecto User", ": " + properties.getProperty("PerfectoUser")); 
+            break;
+            
+		case APPIUM_DEVICE:
+			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
+					"Executed on", ": " + "Mobile Device on Appium Server @ " + testParameters.getRemoteUrl());
+			report.addTestLogSubHeading("Device Type", ": " + testParameters.getDeviceType(),
+					"Device Name", ": " + testParameters.getDeviceName());
             break;
             
 		default:
@@ -375,7 +394,7 @@ public abstract class DriverScript {
 	protected void quitWebDriver() {
 		report.addTestLogSubSection("CloseBrowser");
 		
-		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_REMOTEWEBDRIVER) {
+		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_DEVICE) {
 			downloadPerfectoResults();
 		}
 		

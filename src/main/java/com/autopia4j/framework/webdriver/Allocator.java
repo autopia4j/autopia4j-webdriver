@@ -146,6 +146,13 @@ public class Allocator {
 					testParameters.setExecutionMode(ExecutionMode.valueOf(properties.getProperty("DefaultExecutionMode")));
 				}
 				
+				String remoteUrl = runManagerAccess.getValue(currentTestInstance, "RemoteUrl");
+				if (!"".equals(remoteUrl) && !"N/A".equals(remoteUrl)) {
+					testParameters.setRemoteUrl(remoteUrl);
+				} else {
+					testParameters.setRemoteUrl(properties.getProperty("DefaultRemoteUrl"));
+				}
+				
 				String deviceType = runManagerAccess.getValue(currentTestInstance, "DeviceType");
 				if (!"".equals(deviceType)) {
 					testParameters.setDeviceType(DeviceType.valueOf(deviceType));
@@ -154,10 +161,10 @@ public class Allocator {
 				}
 				
 				String deviceName = runManagerAccess.getValue(currentTestInstance, "DeviceName");
-				if (!"".equals(deviceName)) {
+				if (!"".equals(deviceName) && !"N/A".equals(deviceName)) {
 					testParameters.setDeviceName(deviceName);
 				} else {
-					testParameters.setDeviceName(properties.getProperty("DefaultDevice"));
+					testParameters.setDeviceName(properties.getProperty("DefaultDeviceName"));
 				}
 				
 				String browser = runManagerAccess.getValue(currentTestInstance, "Browser");

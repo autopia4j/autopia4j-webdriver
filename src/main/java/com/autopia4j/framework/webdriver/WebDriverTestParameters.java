@@ -1,12 +1,15 @@
 package com.autopia4j.framework.webdriver;
 
+import java.net.URL;
 import java.util.Properties;
 
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.core.TestParameters;
 import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.utils.Util;
 
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.ScreenOrientation;
 
 
 /**
@@ -19,7 +22,10 @@ public class WebDriverTestParameters extends TestParameters {
 	private String browserVersion;
 	private Platform platform;
 	private DeviceType deviceType;
+	private ScreenOrientation screenOrientation;
 	private String deviceName;
+	private URL remoteUrl;
+	
 	private String perfectoDeviceId;
 	
 	public WebDriverTestParameters(String currentScenario, String currentTestcase) {
@@ -41,7 +47,7 @@ public class WebDriverTestParameters extends TestParameters {
 	public void setExecutionMode(ExecutionMode executionMode) {
 		this.executionMode = executionMode;
 		
-		if (ExecutionMode.PERFECTO_REMOTEWEBDRIVER.equals(executionMode) &&
+		if (ExecutionMode.PERFECTO_DEVICE.equals(executionMode) &&
 														this.browser == null) {
 			this.browser = Browser.PERFECTO_MOBILE_DEFAULT;
 		}
@@ -124,11 +130,36 @@ public class WebDriverTestParameters extends TestParameters {
 	}
 	
 	/**
-	 * Function to set the {@link DeviceType} on which the test is to be executed
+	 * Function to set the {@link DeviceType} on which the test is to be executed<br>
+	 * This internally sets the Screen Orientation test parameter as well
 	 * @param deviceType The {@link DeviceType} on which the test is to be executed
 	 */
 	public void setDeviceType(DeviceType deviceType) {
 		this.deviceType = deviceType;
+		setScreenOrientation();
+	}
+	
+	/**
+	 * Function to get the {@link ScreenOrientation} of the device on which the test is to be executed
+	 * @return The {@link ScreenOrientation} of the device on which the test is to be executed
+	 */
+	public ScreenOrientation getScreenOrientation() {
+		return screenOrientation;
+	}
+	
+	private void setScreenOrientation() {
+		switch (deviceType) {
+		case MOBILE_PORTRAIT:
+		case TABLET_PORTRAIT:
+			this.screenOrientation = ScreenOrientation.PORTRAIT;
+			
+		case MOBILE_LANDSCAPE:
+		case TABLET_LANDSCAPE:
+			this.screenOrientation = ScreenOrientation.LANDSCAPE;
+			
+		default:
+			this.screenOrientation = ScreenOrientation.PORTRAIT;
+		}
 	}
 	
 	/**
@@ -148,10 +179,34 @@ public class WebDriverTestParameters extends TestParameters {
 	public void setDeviceName(String deviceName) {
 		this.deviceName = deviceName;
 		
-		if(ExecutionMode.PERFECTO_REMOTEWEBDRIVER.equals(this.executionMode)) {
+		if(ExecutionMode.PERFECTO_DEVICE.equals(this.executionMode)) {
 			Properties properties = Settings.getInstance();
 			this.perfectoDeviceId = properties.getProperty(deviceName);
 		}
+	}
+	
+	/**
+	 * Function to get the URL of the Remote WebDriver Server on which this test is to be executed
+	 * @return The Remote WebDriver Server URL
+	 */
+	public URL getRemoteUrl() {
+		return remoteUrl;
+	}
+	
+	/**
+	 * Function to set the URL of the Remote WebDriver Server on which this test is to be executed
+	 * @param remoteUrl The Remote WebDriver Server URL
+	 */
+	public void setRemoteUrl(URL remoteUrl) {
+		this.remoteUrl = remoteUrl;
+	}
+	
+	/**
+	 * Function to set the URL of the Remote WebDriver Server on which this test is to be executed
+	 * @param remoteUrl The Remote WebDriver Server URL
+	 */
+	public void setRemoteUrl(String remoteUrl) {
+		this.remoteUrl = Util.getUrl(remoteUrl);
 	}
 	
 	/**
@@ -176,7 +231,7 @@ public class WebDriverTestParameters extends TestParameters {
 		
 		if("".equals(additionalDetails)) {
 			switch(this.executionMode) {
-			case PERFECTO_REMOTEWEBDRIVER:
+			case PERFECTO_DEVICE:
 				additionalDetails = this.getPerfectoDeviceDetails();
 				break;
 				

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.autopia4j.framework</groupId>
   <artifactId>autopia4j-webdriver</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>autopia4j framework for webdriver</name>
   <description>autopia4j framework for webdriver</description>
   <build>
@@ -59,8 +59,22 @@
   		<artifactId>phantomjsdriver</artifactId>
   		<version>1.2.1</version>
   	</dependency>
+  	<dependency>
+  		<groupId>io.appium</groupId>
+  		<artifactId>java-client</artifactId>
+  		<version>4.0.0</version>
+  	</dependency>
   </dependencies>
   <properties>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <url>https://bitbucket.org/autopiateam/autopia4j-webdriver</url>
+  <organization>
+  	<name>Autopia Team</name>
+  	<url>https://bitbucket.org/autopiateam/</url>
+  </organization>
+  <issueManagement>
+  	<system>BitBucket</system>
+  	<url>https://bitbucket.org/autopiateam/autopia4j-webdriver/issues?status=new&amp;status=open</url>
+  </issueManagement>
 </project>

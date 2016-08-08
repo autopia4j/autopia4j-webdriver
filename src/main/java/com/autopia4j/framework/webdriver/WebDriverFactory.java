@@ -247,7 +247,7 @@ public class WebDriverFactory {
 	 * @return The corresponding {@link RemoteWebDriver} object
 	 */
 	public static WebDriver getRemoteWebDriver(Browser browser, String browserVersion,
-												Platform platform, String remoteUrl) {
+												Platform platform, URL remoteUrl) {
 		// For running RemoteWebDriver tests in Chrome and IE:
 		// The ChromeDriver and IEDriver executables needs to be in the PATH of the remote machine
 		// To set the executable path manually, use:
@@ -285,9 +285,7 @@ public class WebDriverFactory {
 		
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = Util.getUrl(remoteUrl);
-		
-		return new RemoteWebDriver(url, desiredCapabilities);
+		return new RemoteWebDriver(remoteUrl, desiredCapabilities);
 	}
 	
 	/**
@@ -296,7 +294,7 @@ public class WebDriverFactory {
 	 * @param remoteUrl The URL of the remote machine to be used for the test execution
 	 * @return The corresponding {@link RemoteWebDriver} object
 	 */
-	public static WebDriver getRemoteWebDriver(Browser browser, String remoteUrl) {
+	public static WebDriver getRemoteWebDriver(Browser browser, URL remoteUrl) {
 		return getRemoteWebDriver(browser, null, null, remoteUrl);
 	}
 	
@@ -333,13 +331,11 @@ public class WebDriverFactory {
 	 * @param remoteUrl The URL of the remote machine to be used for the test execution
 	 * @return The corresponding {@link RemoteWebDriver} object
 	 */
-	public static WebDriver getEmulatedRemoteWebDriver(String deviceName, String remoteUrl) {
+	public static WebDriver getEmulatedRemoteWebDriver(String deviceName, URL remoteUrl) {
 		DesiredCapabilities desiredCapabilities = getEmulatedChromeDriverCapabilities(deviceName);
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = Util.getUrl(remoteUrl);
-		
-		return new RemoteWebDriver(url, desiredCapabilities);
+		return new RemoteWebDriver(remoteUrl, desiredCapabilities);
 	}
 	
 	/**
