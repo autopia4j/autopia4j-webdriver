@@ -6,7 +6,9 @@ package com.autopia4j.framework.webdriver;
  */
 public enum Browser {
 	CHROME("chrome"),
+	EDGE("edge"),
 	FIREFOX("firefox"),
+	FIREFOX_MARIONETTE("marionette"),
 	GHOST_DRIVER("phantomjs"),
 	HTML_UNIT("htmlunit"),
 	INTERNET_EXPLORER("internet explorer"),

@@ -12,6 +12,7 @@ import org.openqa.selenium.Proxy.ProxyType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -23,9 +24,16 @@ import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.FrameworkException;
-import com.autopia4j.framework.utils.Util;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
+
+import io.github.bonigarcia.wdm.Architecture;
+import io.github.bonigarcia.wdm.ChromeDriverManager;
+import io.github.bonigarcia.wdm.EdgeDriverManager;
+import io.github.bonigarcia.wdm.InternetExplorerDriverManager;
+import io.github.bonigarcia.wdm.MarionetteDriverManager;
+import io.github.bonigarcia.wdm.OperaDriverManager;
+import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 
 
 /**
@@ -61,10 +69,18 @@ public class WebDriverFactory {
 			desiredCapabilities = DesiredCapabilities.chrome();
 			desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 			
-			System.setProperty("webdriver.chrome.driver",
-					 			properties.getProperty("BrowserDriversPath") +
-					 			Util.getFileSeparator() + "chromedriver.exe");
+			ChromeDriverManager.getInstance().setup();
 			driver = new ChromeDriver(desiredCapabilities);
+			break;
+			
+		case EDGE:
+			// Takes the system proxy settings automatically
+			
+			desiredCapabilities = DesiredCapabilities.edge();
+			desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
+			
+			EdgeDriverManager.getInstance().setup();
+			driver = new EdgeDriver(desiredCapabilities);
 			break;
 			
 		case FIREFOX:
@@ -79,15 +95,22 @@ public class WebDriverFactory {
 			driver = new FirefoxDriver(firefoxProfile);
 			break;
 			
+		case FIREFOX_MARIONETTE:
+			// Takes the system proxy settings automatically
+			
+			MarionetteDriverManager.getInstance().setup();
+			desiredCapabilities = DesiredCapabilities.firefox();
+			desiredCapabilities.setCapability("marionette", true);
+			driver = new FirefoxDriver(desiredCapabilities);
+			break;
+			
 		case GHOST_DRIVER:
 			// Takes the system proxy settings automatically (I think!)
 			
 			desiredCapabilities = DesiredCapabilities.phantomjs();
 			desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 			
-			System.setProperty("phantomjs.binary.path",
-					properties.getProperty("BrowserDriversPath") +
-		 			Util.getFileSeparator() + "phantomjs-2.1.1-windows\\bin\\phantomjs.exe");
+			PhantomJsDriverManager.getInstance().setup();
 			driver = new PhantomJSDriver(desiredCapabilities);
 			break;
 			
@@ -128,9 +151,7 @@ public class WebDriverFactory {
 				}
 			}
 			
-			System.setProperty("webdriver.ie.driver",
-								properties.getProperty("BrowserDriversPath") +
-								Util.getFileSeparator() + "IEDriverServer_x86.exe");
+			InternetExplorerDriverManager.getInstance().setup(Architecture.x32);	// The 64 bit driver works excruciatingly slow on 64 bit machines!
 			
 			driver = new InternetExplorerDriver(desiredCapabilities);
 			break;
@@ -138,6 +159,8 @@ public class WebDriverFactory {
 		case OPERA:
 			// Does not take the system proxy settings automatically!
 			// NTLM authentication for proxy NOT supported
+			
+			OperaDriverManager.getInstance().setup();
 			
 			if (proxyRequired) {
 				desiredCapabilities = getProxyCapabilities();
@@ -293,9 +316,7 @@ public class WebDriverFactory {
 		DesiredCapabilities desiredCapabilities = getEmulatedChromeDriverCapabilities(deviceName);
 		
 		properties = Settings.getInstance();
-		System.setProperty("webdriver.chrome.driver",
- 				"..\\Framework_Selenium\\libs\\selenium\\browser-drivers\\chromedriver.exe");
-		
+		ChromeDriverManager.getInstance().setup();
 		return new ChromeDriver(desiredCapabilities);
 	}
 	
@@ -343,9 +364,7 @@ public class WebDriverFactory {
 															devicePixelRatio, userAgent);
 		
 		properties = Settings.getInstance();
-		System.setProperty("webdriver.chrome.driver",
- 				"..\\Framework_Selenium\\libs\\selenium\\browser-drivers\\chromedriver.exe");
-		
+		ChromeDriverManager.getInstance().setup();
 		return new ChromeDriver(desiredCapabilities);
 	}
 	
