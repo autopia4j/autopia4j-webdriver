@@ -12,7 +12,6 @@ import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.ExcelDataAccess;
-import com.autopia4j.framework.utils.Util;
 
 
 /**
@@ -105,11 +104,8 @@ public class Allocator {
 	}
 	
 	private List<WebDriverTestParameters> getRunInfo(String sheetName) {
-		String runManagerPath = frameworkParameters.getBasePath() +
-										Util.getFileSeparator() + "src" +
-										Util.getFileSeparator() + "test" +
-										Util.getFileSeparator() + "resources";
-		ExcelDataAccess runManagerAccess = new ExcelDataAccess(runManagerPath, "run.configurations");			
+		ExcelDataAccess runManagerAccess =
+					new ExcelDataAccess(frameworkParameters.getBasePath(), "test.run.configurations");			
 		runManagerAccess.setDatasheetName(sheetName);
 		
 		int nTestInstances = runManagerAccess.getLastRowNum();
