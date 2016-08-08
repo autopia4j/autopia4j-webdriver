@@ -97,10 +97,14 @@ public class WebDriverFactory {
 			
 		case FIREFOX_MARIONETTE:
 			// Takes the system proxy settings automatically
+			FirefoxProfile marionetteProfile = new FirefoxProfile();
+			marionetteProfile.setAcceptUntrustedCertificates(acceptAllSslCertificates);
 			
 			MarionetteDriverManager.getInstance().setup();
 			desiredCapabilities = DesiredCapabilities.firefox();
-			desiredCapabilities.setCapability("marionette", true);
+			desiredCapabilities.setCapability(FirefoxDriver.MARIONETTE, true);
+			desiredCapabilities.setCapability(FirefoxDriver.PROFILE, marionetteProfile);
+			
 			driver = new FirefoxDriver(desiredCapabilities);
 			break;
 			
