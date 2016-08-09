@@ -48,14 +48,14 @@ public class PerfectoWebDriverUtil {
 	}
 	/**
 	 * Function to set a Boolean variable indicating whether Perfecto's PDF report should be exported
-	 * @param exportPerfectoHtmlReport Boolean variable indicating whether Perfecto's PDF report should be exported
+	 * @param exportPerfectoPdfReport Boolean variable indicating whether Perfecto's PDF report should be exported
 	 */
 	public void setExportPerfectoPdfReport(Boolean exportPerfectoPdfReport) {
 		this.exportPerfectoPdfReport = exportPerfectoPdfReport;
 	}
 	/**
 	 * Function to set a Boolean variable indicating whether Perfecto's test video recording should be exported
-	 * @param exportPerfectoHtmlReport Boolean variable indicating whether Perfecto's test video recording should be exported
+	 * @param exportPerfectoTestVideo Boolean variable indicating whether Perfecto's test video recording should be exported
 	 */
 	public void setExportPerfectoTestVideo(Boolean exportPerfectoTestVideo) {
 		this.exportPerfectoTestVideo = exportPerfectoTestVideo;

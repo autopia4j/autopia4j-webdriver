@@ -19,7 +19,7 @@ import org.apache.commons.io.FileUtils;
  * @author vj
  */
 public class ModularDriverScript extends DriverScript {
-	private TestScript testCase;
+	private ModularTestScript testCase;
 	
 	
 	/**
@@ -34,9 +34,9 @@ public class ModularDriverScript extends DriverScript {
 	/**
 	 * DriverScript constructor
 	 * @param testParameters A {@link WebDriverTestParameters} object
-	 * @param testCase A {@link TestScript} object
+	 * @param testCase A {@link ModularTestScript} object
 	 */
-	public ModularDriverScript(WebDriverTestParameters testParameters, TestScript testCase) {
+	public ModularDriverScript(WebDriverTestParameters testParameters, ModularTestScript testCase) {
 		super(testParameters);
 		this.testCase = testCase;
 	}
@@ -135,7 +135,7 @@ public class ModularDriverScript extends DriverScript {
 		testCase.initialize(scriptHelper);
 	}
 	
-	private TestScript getTestCaseInstance() {
+	private ModularTestScript getTestCaseInstance() {
 		Class<?> testScriptClass;
 		try {
 			testScriptClass = Class.forName(frameworkParameters.getBasePackageName() +
@@ -149,7 +149,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 		
 		try {
-			return (TestScript) testScriptClass.newInstance();
+			return (ModularTestScript) testScriptClass.newInstance();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new FrameworkException("Error while instantiating the specified test script");

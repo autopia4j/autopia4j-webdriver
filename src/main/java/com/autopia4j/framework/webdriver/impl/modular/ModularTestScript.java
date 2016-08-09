@@ -27,7 +27,7 @@ import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class TestScript {
+public abstract class ModularTestScript {
 	
 	private ResultSummaryManager resultSummaryManager =
 										ResultSummaryManager.getInstance();

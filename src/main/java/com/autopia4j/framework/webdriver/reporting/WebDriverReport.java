@@ -23,8 +23,6 @@ import com.autopia4j.framework.utils.FrameworkException;
  */
 public class WebDriverReport extends Report {
 	private WebDriver driver;
-	//private IMobileDevice device;
-	
 	
 	/**
 	 * Constructor to initialize the Report object

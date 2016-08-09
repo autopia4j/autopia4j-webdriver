@@ -69,6 +69,7 @@ public class ResultSummaryManager {
 	/**
 	 * Function to initialize the test batch execution
 	 * @param runConfiguration The run configuration to be executed
+	 * @param executionEnvironment The environment on which the test batch is to be executed
 	 */
 	public void initializeTestBatch(String runConfiguration, String executionEnvironment) {
 		overallStartTime = Util.getCurrentTime();

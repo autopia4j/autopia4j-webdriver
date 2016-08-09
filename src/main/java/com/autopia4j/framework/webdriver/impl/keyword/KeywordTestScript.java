@@ -20,7 +20,7 @@ import org.testng.annotations.BeforeSuite;
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class TestScript {
+public abstract class KeywordTestScript {
 	/**
 	 * The current scenario
 	 */
