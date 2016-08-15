@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.Status;
@@ -26,6 +28,7 @@ import com.galenframework.reports.model.LayoutReport;
  * @author vj
  */
 public class GalenUtil {
+	private final Logger logger = LoggerFactory.getLogger(GalenUtil.class);
 	private final WebDriver driver;
 	private final WebDriverReport report;
 	private final ReportSettings reportSettings;
@@ -42,7 +45,7 @@ public class GalenUtil {
 		this.report = report;
 		this.reportSettings = report.getReportSettings();
 		
-		galenTests = new LinkedList<GalenTestInfo>();
+		galenTests = new LinkedList<>();
 	}
 	
 	/**
@@ -78,8 +81,7 @@ public class GalenUtil {
 				report.updateTestLog("Galen Test", reportTitle, Status.PASS);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error occurred while running galen test!", e);
 			report.updateTestLog("Galen Test", reportTitle + ". An error occured!", Status.FAIL);
 		}
 	}
@@ -95,7 +97,7 @@ public class GalenUtil {
 		try {
 			pageDump.dumpPage(driver, specFilePath, dumpPath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error occurred while generating Galen page dump!", e);
 			throw new FrameworkException(e.getMessage());
 		}
 	}
@@ -114,8 +116,7 @@ public class GalenUtil {
 				htmlReportBuilder.build(galenTests, galenReportsFolder.getAbsolutePath());
 				cleanGalenReportsData();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Error occurred while exporting Galen reports!", e);
 			}
 		}
 	}

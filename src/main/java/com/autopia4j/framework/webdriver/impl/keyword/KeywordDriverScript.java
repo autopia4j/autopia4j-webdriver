@@ -18,6 +18,9 @@ import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.*;
 
 
@@ -26,6 +29,7 @@ import java.lang.reflect.*;
  * @author vj
  */
 public class KeywordDriverScript extends DriverScript {
+	private final Logger logger = LoggerFactory.getLogger(KeywordDriverScript.class);
 	private List<String> businessFlowData;
 	private int currentSubIteration;
 	
@@ -83,8 +87,9 @@ public class KeywordDriverScript extends DriverScript {
 						try {
 							FileUtils.copyFile(datatable, runTimeDatatable);
 						} catch (IOException e) {
-							e.printStackTrace();
-							throw new FrameworkException("Error in creating run-time datatable: Copying the datatable failed...");
+							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
+							logger.error(errorDescription, e);
+							throw new FrameworkException(errorDescription);
 						}
 					}
 				}
@@ -102,8 +107,9 @@ public class KeywordDriverScript extends DriverScript {
 						try {
 							FileUtils.copyFile(commonDatatable, runTimeCommonDatatable);
 						} catch (IOException e) {
-							e.printStackTrace();
-							throw new FrameworkException("Error in creating run-time datatable: Copying the common datatable failed...");
+							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
+							logger.error(errorDescription, e);
+							throw new FrameworkException(errorDescription);
 						}
 					}
 				}
@@ -133,7 +139,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 		
 		String dataValue;
-		businessFlowData = new ArrayList<String>();
+		businessFlowData = new ArrayList<>();
 		int currentColumnNum = 1;
 		while (true) {
 			dataValue = businessFlowAccess.getValue(rowNum, currentColumnNum);
@@ -157,10 +163,13 @@ public class KeywordDriverScript extends DriverScript {
 			try {
 				executeTestcase(businessFlowData);
 			} catch (FrameworkException fx) {
+				logger.error("Framework exception", fx);
 				exceptionHandler(fx, fx.getErrorName());
 			} catch (InvocationTargetException ix) {
+				logger.error("Invocation target exception", ix);
 				exceptionHandler((Exception)ix.getCause(), "Error");
 			} catch (Exception ex) {
+				logger.error("Exception", ex);
 				exceptionHandler(ex, "Error");
 			}
 			
@@ -171,7 +180,7 @@ public class KeywordDriverScript extends DriverScript {
 	private void executeTestcase(List<String> businessFlowData)
 			throws IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException, InstantiationException {
-		Map<String, Integer> keywordDirectory = new HashMap<String, Integer>();
+		Map<String, Integer> keywordDirectory = new HashMap<>();
 		
 		for (int currentKeywordNum = 0; currentKeywordNum < businessFlowData.size(); currentKeywordNum++) {
 			String[] currentFlowData = businessFlowData.get(currentKeywordNum).split(",");
@@ -205,7 +214,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 	}
 	
-	private void invokeBusinessComponent(String currentKeyword) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	private void invokeBusinessComponent(String currentKeyword) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		Boolean isTestComponentFound = false;
 		String pagesPackage = frameworkParameters.getBasePackageName() + ".pages";
 		String flowsPackage = frameworkParameters.getBasePackageName() + ".flows";
@@ -213,7 +222,6 @@ public class KeywordDriverScript extends DriverScript {
 				new FastClasspathScanner(pagesPackage, flowsPackage)
 			    .scan()
 			    .getNamesOfSubclassesOf(ReusableLibrary.class);
-			    //.getNamesOfAllClasses();
 		
 		for(String className : classNames) {
 			Class<?> testLibrary = Class.forName(className);
@@ -224,6 +232,7 @@ public class KeywordDriverScript extends DriverScript {
 				testComponent = testLibrary.getMethod(currentKeyword, (Class<?>[]) null);
 			} catch(NoSuchMethodException ex) {
 				// If the method is not found in this class, search the next class
+				logger.trace("Method " + currentKeyword + " not found. Continuing search...", ex);
 				continue;
 			}
 			
@@ -237,8 +246,10 @@ public class KeywordDriverScript extends DriverScript {
 		}
 		
 		if(!isTestComponentFound) {
-			throw new FrameworkException("Keyword " + currentKeyword + 
-											" not found within the test library!");
+			String errorDescription = "Keyword " + currentKeyword + 
+											" not found within the test library!";
+			logger.error(errorDescription);
+			throw new FrameworkException(errorDescription);
 		}
 	}
 }

@@ -1,6 +1,10 @@
 package com.autopia4j.framework.webdriver.testrunner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.autopia4j.framework.core.FrameworkParameters;
+import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
@@ -10,6 +14,7 @@ import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
  * @author vj
  */
 class ParallelRunner implements Runnable {
+	private final Logger logger = LoggerFactory.getLogger(ParallelRunner.class);
 	private final WebDriverTestParameters testParameters;
 	private static int testBatchStatus = 0;
 	
@@ -35,7 +40,9 @@ class ParallelRunner implements Runnable {
 	@Override
 	public void run() {
 		FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
-		String testReportName, executionTime, testStatus;
+		String testReportName;
+		String executionTime;
+		String testStatus;
 		
 		if(frameworkParameters.getStopExecution()) {
 			testReportName = "N/A";
@@ -43,7 +50,7 @@ class ParallelRunner implements Runnable {
 			testStatus = "Aborted";
 			testBatchStatus = 1;	// Non-zero outcome indicates failure
 		} else {
-			DriverScript driverScript = null;
+			DriverScript driverScript;
 			
 			switch(frameworkParameters.getFrameworkType()) {
 			case KEYWORD_DRIVEN:
@@ -55,6 +62,9 @@ class ParallelRunner implements Runnable {
 										this.testParameters);
 				//TODO: Directly instantiate the test script class and pass it in here
 				break;
+				
+			default:
+				throw new FrameworkException("Unknown framework type!");	
 			}
 			
 			try {
@@ -63,7 +73,7 @@ class ParallelRunner implements Runnable {
 				executionTime = driverScript.getExecutionTime();
 				testStatus = driverScript.getTestStatus();
 			} catch(Exception ex) {
-				ex.printStackTrace();
+				logger.error("Error occurred during test execution!", ex);
 				
 				testReportName = "N/A";
 				executionTime = "N/A";

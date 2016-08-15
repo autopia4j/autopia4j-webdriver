@@ -95,7 +95,6 @@ public class PerfectoWebDriverFactory {
 			
 		case MOBILE_LANDSCAPE:
 		case TABLET_LANDSCAPE:
-			return "landscape";
 		default:
 			return "landscape";
 		}

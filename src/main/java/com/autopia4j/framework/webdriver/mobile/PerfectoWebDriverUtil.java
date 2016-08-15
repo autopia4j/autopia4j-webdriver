@@ -10,19 +10,27 @@ import java.util.Map;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
+/**
+ * Utility class for Perfecto Mobile
+ * @author vj
+ */
 public class PerfectoWebDriverUtil {
-	
+	private final Logger logger = LoggerFactory.getLogger(PerfectoWebDriverUtil.class);
 	private final WebDriver driver;
 	private final WebDriverReport report;
 	private final ReportSettings reportSettings;
 	
-	private Boolean exportPerfectoHtmlReport, exportPerfectoPdfReport, exportPerfectoTestVideo;
+	private Boolean exportPerfectoHtmlReport;
+	private Boolean exportPerfectoPdfReport;
+	private Boolean exportPerfectoTestVideo;
 	
 	
 	/**
@@ -66,7 +74,7 @@ public class PerfectoWebDriverUtil {
 	 */
 	public void downloadPerfectoResults() {
 		File perfectoResultsFolder = null;
-		if (exportPerfectoHtmlReport | exportPerfectoPdfReport | exportPerfectoTestVideo) {
+		if (exportPerfectoHtmlReport || exportPerfectoPdfReport || exportPerfectoTestVideo) {
 			driver.close();
 			perfectoResultsFolder = report.createResultsSubFolder("Perfecto Results");
 		}
@@ -102,8 +110,9 @@ public class PerfectoWebDriverUtil {
 			outputStream.write(reportBytes);
 			outputStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new FrameworkException("Error occurred while downloading Perfecto report");
+			String errorDescription = "Error occurred while downloading Perfecto report";
+			logger.error(errorDescription, e);
+			throw new FrameworkException(errorDescription);
 		}
 	}
 	
@@ -140,8 +149,9 @@ public class PerfectoWebDriverUtil {
 				outputStream.close();
 				index ++;
 	    	} catch (IOException e) {
-				e.printStackTrace();
-				throw new FrameworkException("Error occurred while downloading Perfecto attachment");
+				String errorDescription = "Error occurred while downloading Perfecto attachment";
+				logger.error(errorDescription, e);
+				throw new FrameworkException(errorDescription);
 			}
 		}
 	}

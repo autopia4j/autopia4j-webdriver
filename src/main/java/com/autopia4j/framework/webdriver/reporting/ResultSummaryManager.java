@@ -1,14 +1,13 @@
 package com.autopia4j.framework.webdriver.reporting;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Date;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
@@ -17,7 +16,6 @@ import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.ReportTheme;
 import com.autopia4j.framework.reporting.ReportThemeFactory;
 import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
@@ -27,12 +25,14 @@ import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
  * @author vj
  */
 public class ResultSummaryManager {
+	private final Logger logger = LoggerFactory.getLogger(ResultSummaryManager.class);
 	private WebDriverReport summaryReport;
 	
 	private ReportSettings reportSettings;
 	private String reportPath;
 	
-	private Date overallStartTime, overallEndTime;
+	private Date overallStartTime;
+	private Date overallEndTime;
 	
 	private Properties properties;
 	private FrameworkParameters frameworkParameters =
@@ -128,19 +128,6 @@ public class ResultSummaryManager {
 	}
 	
 	/**
-	 * Function to set up the error log file within the test report
-	 */
-	public void setupErrorLog() {
-		String errorLogFile = reportPath + Util.getFileSeparator() + "ErrorLog.txt";
-		try {
-			System.setErr(new PrintStream(new FileOutputStream(errorLogFile)));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			throw new FrameworkException("Error while setting up the Error log!");
-		}
-	}
-	
-	/**
 	 * Function to update the results summary with the status of the test instance which was executed
 	 * @param testParameters The {@link WebDriverTestParameters} object containing the details of the test instance which was executed
 	 * @param testReportName The name of the test report file corresponding to the test instance
@@ -181,9 +168,11 @@ public class ResultSummaryManager {
 				FileUtils.copyDirectoryToDirectory(testNgResultSrc, testNgResultDest);
 				FileUtils.copyFileToDirectory(testNgResultCssFile, testNgResultDest);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Error occurred while copying TestNG reports to the Results folder", e);
 			}
 		}
+		
+		summaryReport.copyLogFile();
 	}
 	
 	/**
@@ -195,14 +184,14 @@ public class ResultSummaryManager {
 				Runtime.getRuntime().exec("RunDLL32.EXE shell32.dll,ShellExec_RunDLL " +
 												reportPath + "\\HTML Results\\Summary.Html");
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Error occurred while launching the result summary", e);
 			}
 		} else if (reportSettings.shouldGenerateExcelReports()) {
 			try {
 				Runtime.getRuntime().exec("RunDLL32.EXE shell32.dll,ShellExec_RunDLL " +
 												reportPath + "\\Excel Results\\Summary.xls");
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Error occurred while launching the result summary", e);
 			}
 		}
 	}

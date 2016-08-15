@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.OnError;
@@ -28,11 +31,16 @@ import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverFactory;
 
+/**
+ * Abstract class that implements the core logic of the autopia4j framework for WebDriver 
+ * @author vj
+ */
 public abstract class DriverScript {
-	
+	private final Logger logger = LoggerFactory.getLogger(DriverScript.class);
 	protected int currentIteration;
 	
-	private Date startTime, endTime;
+	private Date startTime;
+	private Date endTime;
 	protected String executionTime;
 	
 	protected DataTableType dataTable;
@@ -48,7 +56,8 @@ public abstract class DriverScript {
 	private Boolean linkScreenshotsToTestLog = true;
 	
 	protected final WebDriverTestParameters testParameters;
-	protected String datatablePath, reportPath;
+	protected String datatablePath;
+	protected String reportPath;
 	
 	
 	/**
@@ -349,8 +358,8 @@ public abstract class DriverScript {
 			report.updateTestLog(exceptionName, exceptionDescription, Status.FAIL, true);
 		}
 		
-		// Print stack trace for detailed debug information
-		ex.printStackTrace();
+		// Log the error/failure
+		logger.error("Error/Failure during test execution", ex);
 		
 		StringWriter stringWriter = new StringWriter();
 		ex.printStackTrace(new PrintWriter(stringWriter));
@@ -407,6 +416,7 @@ public abstract class DriverScript {
 			driver.quit();
 			report.updateTestLog("Close browser", "Browser closed successfully", Status.DONE);
 		} catch(Exception ex) {
+			logger.error("Exception while closing the browser", ex);
 			report.updateTestLog("Close browser", ex.getMessage(), Status.WARNING);
 		}
 	}

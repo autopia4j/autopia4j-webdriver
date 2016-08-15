@@ -10,6 +10,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.reporting.Report;
 import com.autopia4j.framework.reporting.ReportSettings;
@@ -22,6 +24,7 @@ import com.autopia4j.framework.utils.FrameworkException;
  * @author vj
  */
 public class WebDriverReport extends Report {
+	private final Logger logger = LoggerFactory.getLogger(WebDriverReport.class);
 	private WebDriver driver;
 	
 	/**
@@ -68,8 +71,9 @@ public class WebDriverReport extends Report {
 		try {
 			FileUtils.copyFile(scrFile, new File(screenshotPath), true);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new FrameworkException("Error while writing screenshot to file");
+			String errorDescription = "Error while writing screenshot to file";
+			logger.error(errorDescription, e);
+			throw new FrameworkException(errorDescription);
 		}
 	}
 }

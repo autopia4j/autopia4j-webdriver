@@ -73,9 +73,13 @@ public abstract class ModularTestScript {
 	protected FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
 	
 	/**
-	 * Synchronization timeouts
+	 * Object synchronization timeout
 	 */
-	protected long objectSyncTimeout, pageLoadTimeout;
+	protected long objectSyncTimeout;
+	/**
+	 * Page load timeout
+	 */
+	protected long pageLoadTimeout;
 	
 	/**
 	 * The {@link WebDriverTestParameters} object
@@ -129,12 +133,10 @@ public abstract class ModularTestScript {
 		}
 		
 		// Note: Separate threads may be spawned through usage of DataProvider
-		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount();
-		// This will be at test case level (multiple instances on same test case in parallel)
+		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
 		// This level of threading will not be reflected in the summary report
 		
 		resultSummaryManager.initializeSummaryReport(nThreads);
-		resultSummaryManager.setupErrorLog();
 	}
 	
 	private String getRunConfiguration(ITestContext testContext) {
@@ -149,7 +151,6 @@ public abstract class ModularTestScript {
 		if (System.getProperty("ExecutionEnvironment") != null) {
 			return System.getProperty("ExecutionEnvironment");
 		} else {
-			Properties properties = Settings.getInstance();
 			return properties.getProperty("ExecutionEnvironment");
 		}
 	}
@@ -216,6 +217,5 @@ public abstract class ModularTestScript {
 	@AfterSuite(alwaysRun=true)
 	public void tearDownTestSuite() {
 		resultSummaryManager.wrapUp(true);
-		//resultSummaryManager.launchResultSummary();
 	}
 }

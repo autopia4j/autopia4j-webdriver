@@ -23,7 +23,8 @@ public class ScriptHelper {
 	private final WebDriver driver;
 	private final WebDriverUtil driverUtil;
 	private final GalenUtil galenUtil;
-	private final long objectSyncTimeout, pageLoadTimeout;
+	private final long objectSyncTimeout;
+	private final long pageLoadTimeout;
 	
 	
 	/**

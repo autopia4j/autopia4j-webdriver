@@ -55,12 +55,10 @@ public abstract class KeywordTestScript {
 		}
 		
 		// Note: Separate threads may be spawned through usage of DataProvider
-		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount();
-		// This will be at test case level (multiple instances on same test case in parallel)
+		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
 		// This level of threading will not be reflected in the summary report
 		
 		resultSummaryManager.initializeSummaryReport(nThreads);
-		resultSummaryManager.setupErrorLog();
 	}
 	
 	private String getRunConfiguration(ITestContext testContext) {
@@ -125,6 +123,5 @@ public abstract class KeywordTestScript {
 	@AfterSuite
 	public void tearDownTestSuite() {
 		resultSummaryManager.wrapUp(true);
-		//resultSummaryManager.launchResultSummary();
 	}
 }

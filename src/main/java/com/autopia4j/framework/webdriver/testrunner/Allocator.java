@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.openqa.selenium.Platform;
-
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.Settings;
@@ -35,8 +34,9 @@ public class Allocator {
 	 * Function to drive the batch execution of test cases
 	 * based on the specified Run Configuration within the Run Manager file
 	 * @return Returns a value of 0 if the test batch passes and 1 if the test batch fails
+	 * @throws InterruptedException Exception thrown in case of issues waiting for the parallel executor to terminate
 	 */
-	public int driveBatchExecution() {
+	public int driveBatchExecution() throws InterruptedException {
 		resultSummaryManager.setRelativePath();
 		properties = Settings.getInstance();
 		
@@ -47,8 +47,6 @@ public class Allocator {
 		
 		int nThreads = Integer.parseInt(properties.getProperty("NumberOfThreads"));
 		resultSummaryManager.initializeSummaryReport(nThreads);
-		
-		resultSummaryManager.setupErrorLog();
 		
 		int testBatchStatus = executeTestBatch(nThreads);
 		
@@ -77,7 +75,7 @@ public class Allocator {
 		}
 	}
 	
-	private int executeTestBatch(int nThreads) {
+	private int executeTestBatch(int nThreads) throws InterruptedException {
 		List<WebDriverTestParameters> testInstancesToRun =
 							getRunInfo(frameworkParameters.getRunConfiguration());
 		ExecutorService parallelExecutor = Executors.newFixedThreadPool(nThreads);
@@ -94,11 +92,7 @@ public class Allocator {
 		
 		parallelExecutor.shutdown();
 		while(!parallelExecutor.isTerminated()) {
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			Thread.sleep(3000);
 		}
 		
 		if (testRunner == null) {
@@ -114,7 +108,7 @@ public class Allocator {
 		runManagerAccess.setDatasheetName(sheetName);
 		
 		int nTestInstances = runManagerAccess.getLastRowNum();
-		List<WebDriverTestParameters> testInstancesToRun = new ArrayList<WebDriverTestParameters>();
+		List<WebDriverTestParameters> testInstancesToRun = new ArrayList<>();
 		
 		for (int currentTestInstance = 1; currentTestInstance <= nTestInstances; currentTestInstance++) {
 			String executeFlag = runManagerAccess.getValue(currentTestInstance, "Execute");

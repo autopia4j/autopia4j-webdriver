@@ -58,9 +58,13 @@ public abstract class ReusableLibrary {
 	protected FrameworkParameters frameworkParameters;
 	
 	/**
-	 * Synchronization timeout
+	 * Object synchronization timeout
 	 */
-	protected long objectSyncTimeout, pageLoadTimeout;
+	protected long objectSyncTimeout;
+	/**
+	 * Page load timeout
+	 */
+	protected long pageLoadTimeout;
 	
 	
 	/**

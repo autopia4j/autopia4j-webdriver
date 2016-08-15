@@ -28,8 +28,13 @@ public class WebDriverTestParameters extends TestParameters {
 	
 	private String perfectoDeviceId;
 	
-	public WebDriverTestParameters(String currentScenario, String currentTestcase) {
-		super(currentScenario, currentTestcase);
+	/**
+	 * Constructor to initialize the {@link WebDriverTestParameters} object
+	 * @param currentModule The current module
+	 * @param currentTestcase The current test case
+	 */
+	public WebDriverTestParameters(String currentModule, String currentTestcase) {
+		super(currentModule, currentTestcase);
 	}
 	
 	/**
@@ -152,10 +157,12 @@ public class WebDriverTestParameters extends TestParameters {
 		case MOBILE_PORTRAIT:
 		case TABLET_PORTRAIT:
 			this.screenOrientation = ScreenOrientation.PORTRAIT;
+			break;
 			
 		case MOBILE_LANDSCAPE:
 		case TABLET_LANDSCAPE:
 			this.screenOrientation = ScreenOrientation.LANDSCAPE;
+			break;
 			
 		default:
 			this.screenOrientation = ScreenOrientation.PORTRAIT;

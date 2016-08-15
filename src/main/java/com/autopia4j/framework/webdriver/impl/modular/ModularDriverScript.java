@@ -12,6 +12,8 @@ import com.autopia4j.framework.webdriver.core.ScriptHelper;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -19,6 +21,7 @@ import org.apache.commons.io.FileUtils;
  * @author vj
  */
 public class ModularDriverScript extends DriverScript {
+	private final Logger logger = LoggerFactory.getLogger(ModularDriverScript.class);
 	private ModularTestScript testCase;
 	
 	
@@ -90,8 +93,9 @@ public class ModularDriverScript extends DriverScript {
 						try {
 							FileUtils.copyFile(datatable, runTimeDatatable);
 						} catch (IOException e) {
-							e.printStackTrace();
-							throw new FrameworkException("Error in creating run-time datatable: Copying the datatable failed...");
+							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
+							logger.error(errorDescription, e);
+							throw new FrameworkException(errorDescription);
 						}
 					}
 				}
@@ -109,8 +113,9 @@ public class ModularDriverScript extends DriverScript {
 						try {
 							FileUtils.copyFile(commonDatatable, runTimeCommonDatatable);
 						} catch (IOException e) {
-							e.printStackTrace();
-							throw new FrameworkException("Error in creating run-time datatable: Copying the common datatable failed...");
+							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
+							logger.error(errorDescription, e);
+							throw new FrameworkException(errorDescription);
 						}
 					}
 				}
@@ -144,15 +149,17 @@ public class ModularDriverScript extends DriverScript {
 												testParameters.getCurrentModule()) +
 											"." + testParameters.getCurrentTestcase());
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			throw new FrameworkException("The specified test case is not found!");
+			String errorDescription = "The specified test case is not found!";
+			logger.error(errorDescription, e);
+			throw new FrameworkException(errorDescription);
 		}
 		
 		try {
 			return (ModularTestScript) testScriptClass.newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new FrameworkException("Error while instantiating the specified test script");
+			String errorDescription = "Error while instantiating the specified test script";
+			logger.error(errorDescription, e);
+			throw new FrameworkException(errorDescription);
 		}
 	}
 	

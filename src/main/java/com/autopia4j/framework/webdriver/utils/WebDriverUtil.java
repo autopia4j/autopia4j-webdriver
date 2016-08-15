@@ -12,6 +12,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.utils.FrameworkException;
 
@@ -23,8 +25,10 @@ import org.openqa.selenium.TimeoutException;
  * @author vj
  */
 public class WebDriverUtil {
+	private final Logger logger = LoggerFactory.getLogger(WebDriverUtil.class);
 	private WebDriver driver;
-	private final long objectSyncTimeout, pageLoadTimeout;
+	private final long objectSyncTimeout;
+	private final long pageLoadTimeout;
 	
 	/**
 	 * Constructor to initialize the {@link WebDriverUtil} object
@@ -46,13 +50,14 @@ public class WebDriverUtil {
 		try {
 			Thread.sleep(milliSeconds);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error("Error occurred while waiting!");
 		}
 	}
 	
 	/**
 	 * Function to wait until the page loads completely
 	 * @param timeOutInSeconds The wait timeout in seconds
+	 * @deprecated
 	 */
 	@Deprecated
 	public void waitUntilPageLoaded(long timeOutInSeconds) {
@@ -71,7 +76,7 @@ public class WebDriverUtil {
 		ExpectedCondition<Boolean> pageReadyStateComplete =
 			new ExpectedCondition<Boolean>() {
 	            public Boolean apply(WebDriver driver) {
-	                return ((JavascriptExecutor) driver).executeScript("return document.readyState").equals("complete");
+	                return "complete".equals(((JavascriptExecutor) driver).executeScript("return document.readyState"));
 	            }
 	        };
 		    
@@ -251,6 +256,7 @@ public class WebDriverUtil {
 			new WebDriverWait(driver, timeOutInSeconds).until(ExpectedConditions.alertIsPresent());
 			return true;
 		} catch (TimeoutException ex) {
+			logger.info("Timed out waiting for alert to appear", ex);
 			return false;
 		}
 	}
