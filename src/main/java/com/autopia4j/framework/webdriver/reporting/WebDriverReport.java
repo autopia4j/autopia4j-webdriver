@@ -8,6 +8,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -47,17 +48,15 @@ public class WebDriverReport extends Report {
 	@Override
 	protected void takeScreenshot(String screenshotPath) {
 		if (driver == null) {
-			throw new FrameworkException("Report.driver is not initialized!");
+			throw new FrameworkException("The driver object is not initialized!");
 		}
 		
-		if ("HtmlUnitDriver".equals(driver.getClass().getSimpleName()) || 
-						"class org.openqa.selenium.htmlunit.HtmlUnitDriver"
-						.equals(driver.getClass().getGenericSuperclass().toString())) {
+		if (driver instanceof HtmlUnitDriver) {
 			return;	// Screenshots not supported in headless mode
 		}
 		
 		File scrFile;
-		if ("RemoteWebDriver".equals(driver.getClass().getSimpleName())) {
+		if (driver instanceof RemoteWebDriver) {
 			Capabilities capabilities = ((RemoteWebDriver) driver).getCapabilities();
 			if ("htmlunit".equals(capabilities.getBrowserName())) {
 				return;	// Screenshots not supported in headless mode
