@@ -40,7 +40,7 @@ public abstract class KeywordTestScript {
 	 */
 	@BeforeSuite
 	public void setUpTestSuite(ITestContext testContext) {
-		resultSummaryManager.setRelativePath();
+		resultSummaryManager.setBasePath();
 		
 		String runConfiguration = getRunConfiguration(testContext);
 		String executionEnvironment = getExecutionEnvironment();

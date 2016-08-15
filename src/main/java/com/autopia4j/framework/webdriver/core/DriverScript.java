@@ -115,6 +115,7 @@ public abstract class DriverScript {
 	
 	protected void startUp() {
 		startTime = Util.getCurrentTime();
+		logger.info("Starting test execution");
 		
 		properties = Settings.getInstance();
 		
@@ -129,31 +130,44 @@ public abstract class DriverScript {
 	
 	private void setDefaultTestParameters() {
 		if (testParameters.getIterationMode() == null) {
+			logger.info("Iteration mode unspecified. Setting to default value: All Iterations");
 			testParameters.setIterationMode(IterationOptions.RUN_ALL_ITERATIONS);
 		}
 		
 		if (testParameters.getExecutionMode() == null) {
-			testParameters.setExecutionMode(ExecutionMode.valueOf(properties.getProperty("DefaultExecutionMode")));
+			String defaultExecutionMode = properties.getProperty("DefaultExecutionMode");
+			logger.info("Execution mode unspecified. Setting to default value: {}", defaultExecutionMode);
+			testParameters.setExecutionMode(ExecutionMode.valueOf(defaultExecutionMode));
 		}
 		
 		if (testParameters.getDeviceName() == null) {
-			testParameters.setDeviceName(properties.getProperty("DefaultDeviceName"));
+			String defaultDeviceName = properties.getProperty("DefaultDeviceName");
+			logger.info("Device name unspecified. Setting to default value: {}", defaultDeviceName);
+			testParameters.setDeviceName(defaultDeviceName);
 		}
 		
 		if (testParameters.getBrowser() == null) {
-			testParameters.setBrowser(Browser.valueOf(properties.getProperty("DefaultBrowser")));
+			String defaultBrowser = properties.getProperty("DefaultBrowser");
+			logger.info("Browser unspecified. Setting to default value: {}", defaultBrowser);
+			testParameters.setBrowser(Browser.valueOf(defaultBrowser));
 		}
 		
 		if (testParameters.getPlatform() == null) {
-			testParameters.setPlatform(Platform.valueOf(properties.getProperty("DefaultPlatform")));
+			String defaultPlatform = properties.getProperty("DefaultPlatform");
+			logger.info("Platform unspecified. Setting to default value: {}", defaultPlatform);
+			testParameters.setPlatform(Platform.valueOf(defaultPlatform));
 		}
 		
 		if (testParameters.getDeviceType() == null) {
-			testParameters.setDeviceType(DeviceType.valueOf(properties.getProperty("DefaultDeviceType")));
+			String defaultDeviceType = properties.getProperty("DefaultDeviceType");
+			logger.info("Device Type unspecified. Setting to default value: {}", defaultDeviceType);
+			testParameters.setDeviceType(DeviceType.valueOf(defaultDeviceType));
 		}
 		
 		if(testParameters.getRemoteUrl() == null) {
-			testParameters.setRemoteUrl(properties.getProperty("DefaultRemoteUrl"));
+			String defaultRemoteUrl = properties.getProperty("DefaultRemoteUrl");
+			logger.info("Remote URL unspecified. Setting to default value: {}", defaultRemoteUrl);
+			testParameters.setRemoteUrl(defaultRemoteUrl);
 		}
 	}
 	
@@ -185,6 +199,7 @@ public abstract class DriverScript {
 	protected abstract int getNumberOfIterations();
 	
 	protected void initializeWebDriver() {
+		logger.info("Initializing WebDriver");
 		switch(testParameters.getExecutionMode()) {
 		case LOCAL:
 			driver = WebDriverFactory.getWebDriver(testParameters.getBrowser());
@@ -245,6 +260,7 @@ public abstract class DriverScript {
 	}
 	
 	protected void initializeTestReport() {
+		logger.info("Initializing test log");
 		initializeReportSettings();
 		ReportTheme reportTheme =
 				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("ReportsTheme")));
@@ -263,12 +279,11 @@ public abstract class DriverScript {
 		} else {
 			reportPath = TimeStamp.getInstance();
 		}
+		String reportName = testParameters.getCurrentModule() +
+							"_" + testParameters.getCurrentTestcase() +
+							"_" + testParameters.getCurrentTestInstance();
 		
-		reportSettings = new ReportSettings(reportPath,
-											testParameters.getCurrentModule() +
-											"_" + testParameters.getCurrentTestcase() +
-											"_" + testParameters.getCurrentTestInstance());
-		
+		reportSettings = new ReportSettings(reportPath, reportName);
 		reportSettings.setDateFormatString(properties.getProperty("DateFormatString"));
 		reportSettings.setLogLevel(Integer.parseInt(properties.getProperty("LogLevel")));
 		reportSettings.setProjectName(properties.getProperty("ProjectName"));
@@ -405,6 +420,7 @@ public abstract class DriverScript {
 	}
 	
 	protected void quitWebDriver() {
+		logger.info("Quitting WebDriver");
 		report.addTestLogSubSection("CloseBrowser");
 		
 		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_DEVICE) {
@@ -424,6 +440,7 @@ public abstract class DriverScript {
 	protected void wrapUp() {
 		endTime = Util.getCurrentTime();
 		closeTestReport();
+		logger.info("Test execution complete");
 	}
 	
 	private void closeTestReport() {

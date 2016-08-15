@@ -107,9 +107,6 @@ public abstract class ModularTestScript {
 		galenUtil = scriptHelper.getGalenUtil();
 		objectSyncTimeout = scriptHelper.getObjectSyncTimeout();
 		pageLoadTimeout = scriptHelper.getPageLoadTimeout();
-		
-		properties = Settings.getInstance();
-		//frameworkParameters = FrameworkParameters.getInstance();
 	}
 	
 	/**
@@ -118,7 +115,8 @@ public abstract class ModularTestScript {
 	 */
 	@BeforeSuite
 	public void setUpTestSuite(ITestContext testContext) {
-		resultSummaryManager.setRelativePath();
+		resultSummaryManager.setBasePath();
+		properties = Settings.getInstance();
 		
 		String runConfiguration = getRunConfiguration(testContext);
 		String executionEnvironment = getExecutionEnvironment();

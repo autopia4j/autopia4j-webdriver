@@ -70,6 +70,7 @@ public class KeywordDriverScript extends DriverScript {
 	}
 	
 	private void initializeDatatable() {
+		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
 				Boolean.parseBoolean(properties.getProperty("IncludeTestDataInReport"));
@@ -129,13 +130,16 @@ public class KeywordDriverScript extends DriverScript {
 	}
 	
 	private void initializeBusinessFlow() {
+		logger.info("Initializing the business flow for the specified test script");
 		ExcelDataAccess businessFlowAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
 		businessFlowAccess.setDatasheetName("Business_Flow");
 		
 		int rowNum = businessFlowAccess.getRowNum(testParameters.getCurrentTestcase(), 0);
 		if (rowNum == -1) {
-			throw new FrameworkException("The test case \"" + testParameters.getCurrentTestcase() + "\" is not found in the Business Flow sheet!");
+			String errorDescription = "The test case \"" + testParameters.getCurrentTestcase() + "\" is not found in the Business Flow sheet!";
+			logger.error(errorDescription);
+			throw new FrameworkException(errorDescription);
 		}
 		
 		String dataValue;
@@ -151,7 +155,9 @@ public class KeywordDriverScript extends DriverScript {
 		}
 		
 		if (businessFlowData.isEmpty()) {
-			throw new FrameworkException("No business flow found against the test case \"" + testParameters.getCurrentTestcase() + "\"");
+			String errorDescription = "No business flow found against the test case \"" + testParameters.getCurrentTestcase() + "\"";
+			logger.error(errorDescription);
+			throw new FrameworkException(errorDescription);
 		}
 	}
 	
@@ -161,7 +167,8 @@ public class KeywordDriverScript extends DriverScript {
 			
 			// Evaluate each test iteration for any errors
 			try {
-				executeTestcase(businessFlowData);
+				logger.info("Executing the business flow for the specified test script");
+				executeTestScript(businessFlowData);
 			} catch (FrameworkException fx) {
 				logger.error("Framework exception", fx);
 				exceptionHandler(fx, fx.getErrorName());
@@ -177,7 +184,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 	}
 	
-	private void executeTestcase(List<String> businessFlowData)
+	private void executeTestScript(List<String> businessFlowData)
 			throws IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException, InstantiationException {
 		Map<String, Integer> keywordDirectory = new HashMap<>();

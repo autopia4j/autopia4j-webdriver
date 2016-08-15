@@ -37,7 +37,7 @@ public class Allocator {
 	 * @throws InterruptedException Exception thrown in case of issues waiting for the parallel executor to terminate
 	 */
 	public int driveBatchExecution() throws InterruptedException {
-		resultSummaryManager.setRelativePath();
+		resultSummaryManager.setBasePath();
 		properties = Settings.getInstance();
 		
 		String runConfiguration = getRunConfiguration();

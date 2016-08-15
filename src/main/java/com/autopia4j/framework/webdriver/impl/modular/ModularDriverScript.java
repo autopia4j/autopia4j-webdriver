@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ModularDriverScript extends DriverScript {
 	private final Logger logger = LoggerFactory.getLogger(ModularDriverScript.class);
-	private ModularTestScript testCase;
+	private ModularTestScript testScript;
 	
 	
 	/**
@@ -31,7 +31,7 @@ public class ModularDriverScript extends DriverScript {
 	 */
 	public ModularDriverScript(WebDriverTestParameters testParameters) {
 		super(testParameters);
-		this.testCase = null;
+		this.testScript = null;
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class ModularDriverScript extends DriverScript {
 	 */
 	public ModularDriverScript(WebDriverTestParameters testParameters, ModularTestScript testCase) {
 		super(testParameters);
-		this.testCase = testCase;
+		this.testScript = testCase;
 	}
 	
 	@Override
@@ -51,17 +51,19 @@ public class ModularDriverScript extends DriverScript {
 		initializeWebDriver();
 		initializeTestReport();
 		initializeDatatable();
-		initializeTestCase();
+		initializeTestScript();
 		
 		try {
-			testCase.setUp();
+			logger.info("Executing setup for the specified test script");
+			testScript.setUp();
 			executeTestIterations();
 		} catch (FrameworkException fx) {
 			exceptionHandler(fx, fx.getErrorName());
 		}  catch (Exception ex) {
 			exceptionHandler(ex, "Error");
 		} finally {
-			testCase.tearDown();	// tearDown will ALWAYS be called
+			logger.info("Executing tear-down for the specified test script");
+			testScript.tearDown();	// tearDown will ALWAYS be called
 		}
 		
 		quitWebDriver();
@@ -76,6 +78,7 @@ public class ModularDriverScript extends DriverScript {
 	}
 	
 	private void initializeDatatable() {
+		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
 				Boolean.parseBoolean(properties.getProperty("IncludeTestDataInReport"));
@@ -131,16 +134,16 @@ public class ModularDriverScript extends DriverScript {
 		dataTable.setCurrentRow(testParameters.getCurrentTestcase(), currentIteration);
 	}
 	
-	private void initializeTestCase() {
+	private void initializeTestScript() {
 		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
-		if(testCase == null) {
-			testCase = getTestCaseInstance();
+		if(testScript == null) {
+			testScript = getTestScriptInstance();
 		}
-		testCase.initialize(scriptHelper);
+		testScript.initialize(scriptHelper);
 	}
 	
-	private ModularTestScript getTestCaseInstance() {
+	private ModularTestScript getTestScriptInstance() {
 		Class<?> testScriptClass;
 		try {
 			testScriptClass = Class.forName(frameworkParameters.getBasePackageName() +
@@ -169,7 +172,8 @@ public class ModularDriverScript extends DriverScript {
 			
 			// Evaluate each test iteration for any errors
 			try {
-				testCase.executeTest();
+				logger.info("Executing the specified test script");
+				testScript.executeTest();
 			} catch (FrameworkException fx) {
 				exceptionHandler(fx, fx.getErrorName());
 			}  catch (Exception ex) {
