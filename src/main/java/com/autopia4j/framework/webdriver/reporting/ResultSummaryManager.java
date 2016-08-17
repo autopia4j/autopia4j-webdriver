@@ -104,7 +104,7 @@ public class ResultSummaryManager {
 			reportPath = TimeStamp.getInstance();
 		}
 		
-		reportSettings = new ReportSettings(reportPath, "");
+		reportSettings = new ReportSettings(reportPath, "Summary");
 		
 		reportSettings.setDateFormatString(properties.getProperty("DateFormatString"));
 		reportSettings.setProjectName(properties.getProperty("ProjectName"));
