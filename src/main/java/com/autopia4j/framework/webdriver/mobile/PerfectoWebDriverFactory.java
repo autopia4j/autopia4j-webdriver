@@ -9,8 +9,8 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.*;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.Browser;
 import com.autopia4j.framework.webdriver.core.DeviceType;
@@ -79,7 +79,7 @@ public class PerfectoWebDriverFactory {
 		case FIREFOX:
 		case HTML_UNIT:
 		case OPERA:
-			throw new FrameworkException("The browser " + browser.toString() +
+			throw new AutopiaException("The browser " + browser.toString() +
 											" is not supported on the Perfecto MobileCloud");
 			
 		default:

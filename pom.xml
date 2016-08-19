@@ -48,7 +48,7 @@
   	<dependency>
   		<groupId>com.autopia4j.framework</groupId>
   		<artifactId>autopia4j-core</artifactId>
-  		<version>1.1.1</version>
+  		<version>1.1.2</version>
   	</dependency>
   	<dependency>
   		<groupId>io.github.lukehutch</groupId>

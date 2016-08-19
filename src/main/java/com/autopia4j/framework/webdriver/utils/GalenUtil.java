@@ -10,9 +10,9 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.Status;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.galenframework.api.Galen;
@@ -98,7 +98,7 @@ public class GalenUtil {
 			pageDump.dumpPage(driver, specFilePath, dumpPath);
 		} catch (IOException e) {
 			logger.error("Error occurred while generating Galen page dump!", e);
-			throw new FrameworkException(e.getMessage());
+			throw new AutopiaException(e.getMessage());
 		}
 	}
 	

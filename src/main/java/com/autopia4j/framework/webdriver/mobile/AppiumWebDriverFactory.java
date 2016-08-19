@@ -7,7 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.*;
 
-import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.webdriver.core.Browser;
 
 import io.appium.java_client.AppiumDriver;
@@ -65,7 +65,7 @@ public class AppiumWebDriverFactory {
 			return driver;
 			
 		default:
-			throw new FrameworkException("Unsupported Appium platform!");
+			throw new AutopiaException("Unsupported Appium platform!");
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class AppiumWebDriverFactory {
 			return "iOS";
 			
 		default:
-			throw new FrameworkException("Unsupported Appium platform:" + platform.toString());
+			throw new AutopiaException("Unsupported Appium platform:" + platform.toString());
 		}
 	}
 }

@@ -23,8 +23,8 @@ import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.*;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.Browser;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
@@ -108,7 +108,7 @@ public class WebDriverFactory {
 			break;
 			
 		default:
-			throw new FrameworkException("Unhandled browser!");
+			throw new AutopiaException("Unhandled browser!");
 		}
 		
 		return driver;
@@ -247,7 +247,7 @@ public class WebDriverFactory {
 			    String errorDescription = "An error occurred while turning off "
 			    			+ "the popup blocker in Internet Explorer: " + e.getMessage();
 			    LOGGER.error(errorDescription, e);
-				throw new FrameworkException(errorDescription);
+				throw new AutopiaException(errorDescription);
 			}
 		}
 		

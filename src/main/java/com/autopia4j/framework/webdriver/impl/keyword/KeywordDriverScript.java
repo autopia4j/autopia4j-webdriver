@@ -6,9 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.datatable.impl.KeywordDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.ReusableLibrary;
@@ -90,7 +91,7 @@ public class KeywordDriverScript extends DriverScript {
 						} catch (IOException e) {
 							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
 							logger.error(errorDescription, e);
-							throw new FrameworkException(errorDescription);
+							throw new AutopiaException(errorDescription);
 						}
 					}
 				}
@@ -110,7 +111,7 @@ public class KeywordDriverScript extends DriverScript {
 						} catch (IOException e) {
 							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
 							logger.error(errorDescription, e);
-							throw new FrameworkException(errorDescription);
+							throw new AutopiaException(errorDescription);
 						}
 					}
 				}
@@ -139,7 +140,7 @@ public class KeywordDriverScript extends DriverScript {
 		if (rowNum == -1) {
 			String errorDescription = "The test case \"" + testParameters.getCurrentTestcase() + "\" is not found in the Business Flow sheet!";
 			logger.error(errorDescription);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 		
 		String dataValue;
@@ -157,7 +158,7 @@ public class KeywordDriverScript extends DriverScript {
 		if (businessFlowData.isEmpty()) {
 			String errorDescription = "No business flow found against the test case \"" + testParameters.getCurrentTestcase() + "\"";
 			logger.error(errorDescription);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 	}
 	
@@ -169,7 +170,7 @@ public class KeywordDriverScript extends DriverScript {
 			try {
 				logger.info("Executing the business flow for the specified test script");
 				executeTestScript(businessFlowData);
-			} catch (FrameworkException fx) {
+			} catch (AutopiaException fx) {
 				logger.error("Error during test execution", fx);
 				exceptionHandler(fx, fx.getErrorName());
 			} catch (InvocationTargetException ix) {
@@ -256,7 +257,7 @@ public class KeywordDriverScript extends DriverScript {
 			String errorDescription = "Keyword " + currentKeyword + 
 											" not found within the test library!";
 			logger.error(errorDescription);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 	}
 }

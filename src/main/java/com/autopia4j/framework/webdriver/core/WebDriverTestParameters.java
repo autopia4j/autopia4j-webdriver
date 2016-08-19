@@ -3,9 +3,9 @@ package com.autopia4j.framework.webdriver.core;
 import java.net.URL;
 import java.util.Properties;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.core.TestParameters;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 
 import org.openqa.selenium.Platform;
@@ -112,7 +112,7 @@ public class WebDriverTestParameters extends TestParameters {
 	 */
 	public String getBrowserAndPlatform() {
 		if(this.browser == null) {
-			throw new FrameworkException("The browser has not been initialized!");
+			throw new AutopiaException("The browser has not been initialized!");
 		}
 		
 		String browserAndPlatform = this.browser.toString();
@@ -257,7 +257,7 @@ public class WebDriverTestParameters extends TestParameters {
 	
 	private String getPerfectoDeviceDetails() {
 		if (this.perfectoDeviceId == null) {
-			throw new FrameworkException("The Perfecto Device ID has not been initialized!");
+			throw new AutopiaException("The Perfecto Device ID has not been initialized!");
 		}
 		
 		if(this.deviceName == null) {

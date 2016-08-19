@@ -3,8 +3,8 @@ package com.autopia4j.framework.webdriver.testrunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
@@ -64,7 +64,7 @@ class ParallelRunner implements Runnable {
 				break;
 				
 			default:
-				throw new FrameworkException("Unknown framework type!");	
+				throw new AutopiaException("Unknown framework type!");	
 			}
 			
 			try {

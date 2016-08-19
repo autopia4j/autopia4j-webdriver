@@ -3,9 +3,9 @@ package com.autopia4j.framework.webdriver.impl.modular;
 import java.io.File;
 import java.io.IOException;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.datatable.impl.ModularDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
@@ -58,7 +58,7 @@ public class ModularDriverScript extends DriverScript {
 			logger.info("Executing setup for the specified test script");
 			testScript.get().setUp();
 			executeTestIterations();
-		} catch (FrameworkException fx) {
+		} catch (AutopiaException fx) {
 			exceptionHandler(fx, fx.getErrorName());
 		}  catch (Exception ex) {
 			exceptionHandler(ex, "Error");
@@ -99,7 +99,7 @@ public class ModularDriverScript extends DriverScript {
 						} catch (IOException e) {
 							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
 							logger.error(errorDescription, e);
-							throw new FrameworkException(errorDescription);
+							throw new AutopiaException(errorDescription);
 						}
 					}
 				}
@@ -119,7 +119,7 @@ public class ModularDriverScript extends DriverScript {
 						} catch (IOException e) {
 							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
 							logger.error(errorDescription, e);
-							throw new FrameworkException(errorDescription);
+							throw new AutopiaException(errorDescription);
 						}
 					}
 				}
@@ -155,7 +155,7 @@ public class ModularDriverScript extends DriverScript {
 		} catch (ClassNotFoundException e) {
 			String errorDescription = "The specified test case is not found!";
 			logger.error(errorDescription, e);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 		
 		try {
@@ -163,7 +163,7 @@ public class ModularDriverScript extends DriverScript {
 		} catch (Exception e) {
 			String errorDescription = "Error while instantiating the specified test script";
 			logger.error(errorDescription, e);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class ModularDriverScript extends DriverScript {
 			try {
 				logger.info("Executing the specified test script");
 				testScript.get().executeTest();
-			} catch (FrameworkException fx) {
+			} catch (AutopiaException fx) {
 				exceptionHandler(fx, fx.getErrorName());
 			}  catch (Exception ex) {
 				exceptionHandler(ex, "Error");

@@ -13,8 +13,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.reporting.ReportSettings;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
@@ -112,7 +112,7 @@ public class PerfectoWebDriverUtil {
 		} catch (IOException e) {
 			String errorDescription = "Error occurred while downloading Perfecto report";
 			logger.error(errorDescription, e);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 	}
 	
@@ -151,7 +151,7 @@ public class PerfectoWebDriverUtil {
 	    	} catch (IOException e) {
 				String errorDescription = "Error occurred while downloading Perfecto attachment";
 				logger.error(errorDescription, e);
-				throw new FrameworkException(errorDescription);
+				throw new AutopiaException(errorDescription);
 			}
 		}
 	}

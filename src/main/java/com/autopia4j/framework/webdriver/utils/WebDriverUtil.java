@@ -15,7 +15,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.autopia4j.framework.utils.FrameworkException;
+import com.autopia4j.framework.core.AutopiaException;
 
 import org.openqa.selenium.TimeoutException;
 
@@ -298,7 +298,7 @@ public class WebDriverUtil {
 			}
 		}
 		if(openWindowHandles.length < nPopupsAlreadyOpen+2) {
-			throw new FrameworkException("The pop-up window did not open as expected!");
+			throw new AutopiaException("The pop-up window did not open as expected!");
 		}
 		
 		return openWindowHandles[openWindowHandles.length - 1].toString();

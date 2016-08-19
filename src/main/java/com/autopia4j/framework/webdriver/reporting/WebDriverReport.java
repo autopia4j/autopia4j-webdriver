@@ -14,10 +14,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.reporting.Report;
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.ReportTheme;
-import com.autopia4j.framework.utils.FrameworkException;
 
 
 /**
@@ -48,7 +48,7 @@ public class WebDriverReport extends Report {
 	@Override
 	protected void takeScreenshot(String screenshotPath) {
 		if (driver == null) {
-			throw new FrameworkException("The driver object is not initialized!");
+			throw new AutopiaException("The driver object is not initialized!");
 		}
 		
 		if (driver instanceof HtmlUnitDriver) {
@@ -72,7 +72,7 @@ public class WebDriverReport extends Report {
 		} catch (IOException e) {
 			String errorDescription = "Error while writing screenshot to file";
 			logger.error(errorDescription, e);
-			throw new FrameworkException(errorDescription);
+			throw new AutopiaException(errorDescription);
 		}
 	}
 }

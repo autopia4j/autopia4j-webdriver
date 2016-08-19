@@ -11,6 +11,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.OnError;
@@ -22,7 +23,6 @@ import com.autopia4j.framework.reporting.ReportTheme;
 import com.autopia4j.framework.reporting.ReportThemeFactory;
 import com.autopia4j.framework.reporting.Status;
 import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
-import com.autopia4j.framework.utils.FrameworkException;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.mobile.AppiumWebDriverFactory;
 import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverFactory;
@@ -194,13 +194,13 @@ public abstract class DriverScript {
 			
 		case RUN_RANGE_OF_ITERATIONS:
 			if(testParameters.getStartIteration() > testParameters.getEndIteration()) {
-				throw new FrameworkException("Error","StartIteration cannot be greater than EndIteration!");
+				throw new AutopiaException("Error","StartIteration cannot be greater than EndIteration!");
 			}
 			currentIteration = testParameters.getStartIteration();
 			break;
 			
 		default:
-			throw new FrameworkException("Unhandled Iteration Mode!");
+			throw new AutopiaException("Unhandled Iteration Mode!");
 		}
 	}
 	
@@ -252,7 +252,7 @@ public abstract class DriverScript {
 			break;
 			
 		default:
-			throw new FrameworkException("Unhandled Execution Mode!");
+			throw new AutopiaException("Unhandled Execution Mode!");
 		}
 		
 		long objectSyncTimeout =
@@ -361,7 +361,7 @@ public abstract class DriverScript {
             break;
             
 		default:
-			throw new FrameworkException("Unhandled Execution Mode!");
+			throw new AutopiaException("Unhandled Execution Mode!");
 		}
 		
 		report.addTestLogTableHeadings();
@@ -422,7 +422,7 @@ public abstract class DriverScript {
 				break;
 				
 			default:
-				throw new FrameworkException("Unhandled OnError option!");
+				throw new AutopiaException("Unhandled OnError option!");
 			}
 		}
 	}
