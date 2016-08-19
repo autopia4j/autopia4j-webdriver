@@ -69,6 +69,14 @@ public abstract class DriverScript {
 	}
 	
 	/**
+	 * Function to get the {@link WebDriverTestParameters} object
+	 * @return The {@link WebDriverTestParameters} object
+	 */
+	public WebDriverTestParameters getTestParameters() {
+		return testParameters;
+	}
+	
+	/**
 	 * Function to configure the linking of screenshots to the corresponding test log
 	 * @param linkScreenshotsToTestLog Boolean variable indicating whether screenshots should be linked to the corresponding test log
 	 */

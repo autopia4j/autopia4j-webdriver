@@ -29,9 +29,6 @@ import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
  */
 public abstract class ModularTestScript {
 	
-	private ResultSummaryManager resultSummaryManager =
-										ResultSummaryManager.getInstance();
-	
 	/**
 	 * The {@link DeviceType} object (passed from the Driver script)
 	 */
@@ -82,13 +79,16 @@ public abstract class ModularTestScript {
 	protected long pageLoadTimeout;
 	
 	/**
-	 * The {@link WebDriverTestParameters} object
+	 * The current module (auto initialized during the test runner setup)
 	 */
-	protected WebDriverTestParameters testParameters;
+	protected String currentModule;
 	/**
-	 * The {@link ModularDriverScript} object
+	 * The current test script (auto initialized during the test runner setup)
 	 */
-	protected ModularDriverScript driverScript;
+	protected String currentTest;
+	
+	private ResultSummaryManager resultSummaryManager = ResultSummaryManager.getInstance();
+	private ThreadLocal<ModularDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
 	/**
@@ -167,11 +167,8 @@ public abstract class ModularTestScript {
 			String[] currentPackageSplit = this.getClass().getPackage().getName().split(".testscripts.");
 			
 			frameworkParameters.setBasePackageName(currentPackageSplit[0]);
-			String currentModule = Util.capitalizeFirstLetter(currentPackageSplit[1]);
-			String currentTestcase = this.getClass().getSimpleName();
-			
-			testParameters = new WebDriverTestParameters(currentModule, currentTestcase);
-			driverScript = new ModularDriverScript(testParameters, this);
+			currentModule = Util.capitalizeFirstLetter(currentPackageSplit[1]);
+			currentTest = this.getClass().getSimpleName();
 		}
 	}
 	
@@ -193,24 +190,34 @@ public abstract class ModularTestScript {
 	public abstract void tearDown();
 	
 	/**
-	 * Function to do the required framework teardown activities after executing each test case
+	 * {@link Assert} that the test execution passed
+	 * @param driverScript The {@link ModularDriverScript} object
+	 */
+	protected void assertTestPassed(ModularDriverScript driverScript) {
+		currentDriverScript.set(driverScript);
+		if("Failed".equalsIgnoreCase(driverScript.getTestStatus())) {
+			Assert.fail(driverScript.getFailureDescription());
+		}
+	}
+	
+	/**
+	 * Function to do the required framework tear-down activities after executing each test case
 	 */
 	@AfterMethod(alwaysRun=true)
 	public synchronized void tearDownTestRunner() {
+		ModularDriverScript driverScript = currentDriverScript.get();
+		WebDriverTestParameters testParameters = driverScript.getTestParameters();
+		
 		String testReportName = driverScript.getReportName();
 		String executionTime = driverScript.getExecutionTime();
 		String testStatus = driverScript.getTestStatus();
 		
 		resultSummaryManager.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
-		
-		if("Failed".equalsIgnoreCase(testStatus)) {
-			Assert.fail(driverScript.getFailureDescription());
-		}
 	}
 	
 	/**
-	 * Function to do the required framework teardown activities after executing the overall test suite
+	 * Function to do the required framework tear-down activities after executing the overall test suite
 	 */
 	@AfterSuite(alwaysRun=true)
 	public void tearDownTestSuite() {

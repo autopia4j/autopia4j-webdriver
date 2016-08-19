@@ -170,13 +170,13 @@ public class KeywordDriverScript extends DriverScript {
 				logger.info("Executing the business flow for the specified test script");
 				executeTestScript(businessFlowData);
 			} catch (FrameworkException fx) {
-				logger.error("Framework exception", fx);
+				logger.error("Error during test execution", fx);
 				exceptionHandler(fx, fx.getErrorName());
 			} catch (InvocationTargetException ix) {
-				logger.error("Invocation target exception", ix);
+				logger.error("Error during test execution", ix);
 				exceptionHandler((Exception)ix.getCause(), "Error");
 			} catch (Exception ex) {
-				logger.error("Exception", ex);
+				logger.error("Error during test execution", ex);
 				exceptionHandler(ex, "Error");
 			}
 			

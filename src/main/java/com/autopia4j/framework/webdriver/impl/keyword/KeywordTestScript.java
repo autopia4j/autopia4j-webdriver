@@ -11,6 +11,7 @@ import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -22,16 +23,16 @@ import org.testng.annotations.BeforeSuite;
  */
 public abstract class KeywordTestScript {
 	/**
-	 * The current scenario
+	 * The current module (auto initialized during the test runner setup)
 	 */
 	protected String currentModule;
 	/**
-	 * The current test case
+	 * The current test script (auto initialized during the test runner setup)
 	 */
-	protected String currentTestcase;
+	protected String currentTest;
 	
-	private ResultSummaryManager resultSummaryManager =
-										ResultSummaryManager.getInstance();
+	private ResultSummaryManager resultSummaryManager = ResultSummaryManager.getInstance();
+	private ThreadLocal<KeywordDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
 	/**
@@ -94,27 +95,34 @@ public abstract class KeywordTestScript {
 			
 			frameworkParameters.setBasePackageName(currentPackageSplit[0]);
 			currentModule = Util.capitalizeFirstLetter(currentPackageSplit[1]);
-			currentTestcase = this.getClass().getSimpleName();
+			currentTest = this.getClass().getSimpleName();
+		}
+	}
+	
+	/**
+	 * {@link Assert} that the test execution passed
+	 * @param driverScript The {@link KeywordDriverScript} object
+	 */
+	protected void assertTestPassed(KeywordDriverScript driverScript) {
+		currentDriverScript.set(driverScript);
+		if("Failed".equalsIgnoreCase(driverScript.getTestStatus())) {
+			Assert.fail(driverScript.getFailureDescription());
 		}
 	}
 	
 	/**
 	 * Function to do the required framework teardown activities after executing each test case
-	 * @param testParameters The {@link WebDriverTestParameters} object passed from the test case
-	 * @param driverScript The {@link KeywordDriverScript} object passed from the test case
 	 */
-	protected synchronized void tearDownTestRunner(WebDriverTestParameters testParameters,
-													KeywordDriverScript driverScript) {
+	@AfterMethod(alwaysRun=true)
+	protected synchronized void tearDownTestRunner() {
+		KeywordDriverScript driverScript = currentDriverScript.get();
+		WebDriverTestParameters testParameters = driverScript.getTestParameters();
 		String testReportName = driverScript.getReportName();
 		String executionTime = driverScript.getExecutionTime();
 		String testStatus = driverScript.getTestStatus();
 		
 		resultSummaryManager.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
-		
-		if("Failed".equalsIgnoreCase(testStatus)) {
-			Assert.fail(driverScript.getFailureDescription());
-		}
 	}
 	
 	/**

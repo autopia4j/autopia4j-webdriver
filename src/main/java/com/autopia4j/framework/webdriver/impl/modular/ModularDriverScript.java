@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ModularDriverScript extends DriverScript {
 	private final Logger logger = LoggerFactory.getLogger(ModularDriverScript.class);
-	private ModularTestScript testScript;
+	//private ModularTestScript testScript;
+	private ThreadLocal<ModularTestScript> testScript = new ThreadLocal<>();
 	
 	
 	/**
@@ -31,17 +32,17 @@ public class ModularDriverScript extends DriverScript {
 	 */
 	public ModularDriverScript(WebDriverTestParameters testParameters) {
 		super(testParameters);
-		this.testScript = null;
+		//this.testScript = null;
 	}
 	
 	/**
 	 * DriverScript constructor
 	 * @param testParameters A {@link WebDriverTestParameters} object
-	 * @param testCase A {@link ModularTestScript} object
+	 * @param testScript A {@link ModularTestScript} object
 	 */
-	public ModularDriverScript(WebDriverTestParameters testParameters, ModularTestScript testCase) {
+	public ModularDriverScript(WebDriverTestParameters testParameters, ModularTestScript testScript) {
 		super(testParameters);
-		this.testScript = testCase;
+		this.testScript.set(testScript);
 	}
 	
 	@Override
@@ -55,7 +56,7 @@ public class ModularDriverScript extends DriverScript {
 		
 		try {
 			logger.info("Executing setup for the specified test script");
-			testScript.setUp();
+			testScript.get().setUp();
 			executeTestIterations();
 		} catch (FrameworkException fx) {
 			exceptionHandler(fx, fx.getErrorName());
@@ -63,7 +64,7 @@ public class ModularDriverScript extends DriverScript {
 			exceptionHandler(ex, "Error");
 		} finally {
 			logger.info("Executing tear-down for the specified test script");
-			testScript.tearDown();	// tearDown will ALWAYS be called
+			testScript.get().tearDown();	// tearDown will ALWAYS be called
 		}
 		
 		quitWebDriver();
@@ -137,10 +138,10 @@ public class ModularDriverScript extends DriverScript {
 	private void initializeTestScript() {
 		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
-		if(testScript == null) {
-			testScript = getTestScriptInstance();
+		if(testScript.get() == null) {
+			testScript.set(getTestScriptInstance());
 		}
-		testScript.initialize(scriptHelper);
+		testScript.get().initialize(scriptHelper);
 	}
 	
 	private ModularTestScript getTestScriptInstance() {
@@ -173,7 +174,7 @@ public class ModularDriverScript extends DriverScript {
 			// Evaluate each test iteration for any errors
 			try {
 				logger.info("Executing the specified test script");
-				testScript.executeTest();
+				testScript.get().executeTest();
 			} catch (FrameworkException fx) {
 				exceptionHandler(fx, fx.getErrorName());
 			}  catch (Exception ex) {
