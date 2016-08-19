@@ -1,7 +1,5 @@
 package com.autopia4j.framework.webdriver.core;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -380,14 +378,6 @@ public abstract class DriverScript {
 		} else {
 			report.updateTestLog(exceptionName, exceptionDescription, Status.FAIL, true);
 		}
-		
-		// Log the error/failure
-		logger.error("Error/Failure during test execution", ex);
-		
-		StringWriter stringWriter = new StringWriter();
-		ex.printStackTrace(new PrintWriter(stringWriter));
-		String stackTrace = stringWriter.toString();
-		report.updateTestLog("Exception stack trace", stackTrace, Status.DEBUG);
 		
 		// Error response
 		report.addTestLogSubSection("ErrorResponse");

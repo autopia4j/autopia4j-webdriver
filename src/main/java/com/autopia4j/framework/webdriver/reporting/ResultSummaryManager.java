@@ -151,28 +151,36 @@ public class ResultSummaryManager {
 		summaryReport.addResultSummaryFooter(totalExecutionTime);
 		
 		if(testExecutedInUnitTestFramework && System.getProperty("ReportPath") == null) {
-			File testNgResultSrc = new File(frameworkParameters.getBasePath() +
-											Util.getFileSeparator() +
-											properties.getProperty("TestNgReportPath") +
-											Util.getFileSeparator() +
-											frameworkParameters.getRunConfiguration());		
-			File testNgResultCssFile = new File(frameworkParameters.getBasePath() +
-											Util.getFileSeparator() +
-											properties.getProperty("TestNgReportPath") +
-											Util.getFileSeparator() +
-											"testng.css");
-			File testNgResultDest =
-								summaryReport.createResultsSubFolder("TestNG Results");
-			
-			try {
-				FileUtils.copyDirectoryToDirectory(testNgResultSrc, testNgResultDest);
-				FileUtils.copyFileToDirectory(testNgResultCssFile, testNgResultDest);
-			} catch (IOException e) {
-				logger.error("Error occurred while copying TestNG reports to the Results folder", e);
-			}
+			copyTestNgResults();
 		}
 		
 		summaryReport.copyLogFile();
+	}
+	
+	private void copyTestNgResults() {
+		File testNgResultSrc = new File(frameworkParameters.getBasePath() +
+										Util.getFileSeparator() +
+										properties.getProperty("TestNgReportPath") +
+										Util.getFileSeparator() +
+										frameworkParameters.getRunConfiguration());		
+		File testNgResultCssFile = new File(frameworkParameters.getBasePath() +
+										Util.getFileSeparator() +
+										properties.getProperty("TestNgReportPath") +
+										Util.getFileSeparator() +
+										"testng.css");
+		File testNgResultDest =
+							summaryReport.createResultsSubFolder("TestNG Results");
+		
+		try {
+			if(testNgResultSrc.exists()) {
+				FileUtils.copyDirectoryToDirectory(testNgResultSrc, testNgResultDest);
+				FileUtils.copyFileToDirectory(testNgResultCssFile, testNgResultDest);
+			} else {
+				logger.info("Unable to copy TestNG results, because they are not found @ " + testNgResultSrc);
+			}
+		} catch (IOException e) {
+			logger.error("Error occurred while copying TestNG reports to the Results folder", e);
+		}
 	}
 	
 	/**
