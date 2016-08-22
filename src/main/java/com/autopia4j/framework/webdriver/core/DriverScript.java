@@ -142,37 +142,37 @@ public abstract class DriverScript {
 		}
 		
 		if (testParameters.getExecutionMode() == null) {
-			String defaultExecutionMode = properties.getProperty("DefaultExecutionMode");
+			String defaultExecutionMode = properties.getProperty("execution.mode.default");
 			logger.info("Execution mode unspecified. Setting to default value: {}", defaultExecutionMode);
 			testParameters.setExecutionMode(ExecutionMode.valueOf(defaultExecutionMode));
 		}
 		
 		if (testParameters.getDeviceName() == null) {
-			String defaultDeviceName = properties.getProperty("DefaultDeviceName");
+			String defaultDeviceName = properties.getProperty("device.name.default");
 			logger.info("Device name unspecified. Setting to default value: {}", defaultDeviceName);
 			testParameters.setDeviceName(defaultDeviceName);
 		}
 		
 		if (testParameters.getBrowser() == null) {
-			String defaultBrowser = properties.getProperty("DefaultBrowser");
+			String defaultBrowser = properties.getProperty("browser.default");
 			logger.info("Browser unspecified. Setting to default value: {}", defaultBrowser);
 			testParameters.setBrowser(Browser.valueOf(defaultBrowser));
 		}
 		
 		if (testParameters.getPlatform() == null) {
-			String defaultPlatform = properties.getProperty("DefaultPlatform");
+			String defaultPlatform = properties.getProperty("platform.default");
 			logger.info("Platform unspecified. Setting to default value: {}", defaultPlatform);
 			testParameters.setPlatform(Platform.valueOf(defaultPlatform));
 		}
 		
 		if (testParameters.getDeviceType() == null) {
-			String defaultDeviceType = properties.getProperty("DefaultDeviceType");
+			String defaultDeviceType = properties.getProperty("device.type.default");
 			logger.info("Device Type unspecified. Setting to default value: {}", defaultDeviceType);
 			testParameters.setDeviceType(DeviceType.valueOf(defaultDeviceType));
 		}
 		
 		if(testParameters.getRemoteUrl() == null) {
-			String defaultRemoteUrl = properties.getProperty("DefaultRemoteUrl");
+			String defaultRemoteUrl = properties.getProperty("remote.url.default");
 			logger.info("Remote URL unspecified. Setting to default value: {}", defaultRemoteUrl);
 			testParameters.setRemoteUrl(defaultRemoteUrl);
 		}
@@ -262,9 +262,9 @@ public abstract class DriverScript {
 		}
 		
 		long objectSyncTimeout =
-				Long.parseLong(properties.get("ObjectSyncTimeout").toString());
+				Long.parseLong(properties.get("timeout.object.sync").toString());
 		long pageLoadTimeout =
-				Long.parseLong(properties.get("PageLoadTimeout").toString());
+				Long.parseLong(properties.get("timeout.page.load").toString());
 		driver.manage().timeouts().implicitlyWait(objectSyncTimeout, TimeUnit.SECONDS);
 		driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
 		
@@ -276,40 +276,42 @@ public abstract class DriverScript {
 	private void initializeWebDriverFactory() {
 		logger.info("Initializing WebDriverFactory");
 		
-		WebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates")));
-		WebDriverFactory.setIntroduceFlakinessInternetExplorer(Boolean.parseBoolean(properties.getProperty("IntroduceFlakinessInternetExplorer")));
-		WebDriverFactory.setTurnOffPopupBlockerInternetExplorer(Boolean.parseBoolean(properties.getProperty("TurnOffPopupBlockerInternetExplorer")));
+		WebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("ssl.certs.accept.all")));
+		WebDriverFactory.setIntroduceFlakinessInternetExplorer(Boolean.parseBoolean(properties.getProperty("internet.explorer.introduce.flakiness")));
+		WebDriverFactory.setTurnOffPopupBlockerInternetExplorer(Boolean.parseBoolean(properties.getProperty("internet.explorer.popupblocker.turnoff")));
 		
-		Boolean proxyRequired = Boolean.parseBoolean(properties.getProperty("ProxyRequired"));
+		Boolean proxyRequired = Boolean.parseBoolean(properties.getProperty("proxy.required"));
 		WebDriverFactory.setProxyRequired(proxyRequired);
 		
 		if (proxyRequired) {
 			WebDriverProxy proxy = new WebDriverProxy();
-			proxy.setHost(properties.getProperty("ProxyHost"));
-			proxy.setPort(Integer.parseInt(properties.getProperty("ProxyPort")));
+			proxy.setHost(properties.getProperty("proxy.host"));
+			proxy.setPort(Integer.parseInt(properties.getProperty("proxy.port")));
 			
-			Boolean authRequired = Boolean.parseBoolean(properties.getProperty("ProxyAuthenticationRequired"));
+			Boolean authRequired = Boolean.parseBoolean(properties.getProperty("proxy.auth.required"));
 			proxy.setAuthRequired(authRequired);
 			if(authRequired) {
-				proxy.setDomain(properties.getProperty("Domain"));
-				proxy.setUserName(properties.getProperty("Username"));
-				proxy.setPassword(properties.getProperty("Password"));
+				proxy.setDomain(properties.getProperty("proxy.auth.domain"));
+				proxy.setUserName(properties.getProperty("proxy.auth.username"));
+				proxy.setPassword(properties.getProperty("proxy.auth.password"));
 			}
 			WebDriverFactory.setProxy(proxy);
 		}
 	}
 	
 	private void initializePerfectoWebDriverFactory() {
-		PerfectoWebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates")));
-		PerfectoWebDriverFactory.setUserName(properties.getProperty("PerfectoUser"));
-		PerfectoWebDriverFactory.setPassword(properties.getProperty("PerfectoPassword"));
+		logger.info("Initializing PerfectoWebDriverFactory");
+		
+		PerfectoWebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("ssl.certs.accept.all")));
+		PerfectoWebDriverFactory.setUserName(properties.getProperty("perfecto.username"));
+		PerfectoWebDriverFactory.setPassword(properties.getProperty("perfecto.password"));
 	}
 	
 	protected void initializeTestReport() {
 		logger.info("Initializing test log");
 		initializeReportSettings();
 		ReportTheme reportTheme =
-				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("ReportsTheme")));
+				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("report.theme")));
 		
 		report = new WebDriverReport(reportSettings, reportTheme);
 		
@@ -320,8 +322,8 @@ public abstract class DriverScript {
 	}
 	
 	private void initializeReportSettings() {
-		if(System.getProperty("ReportPath") != null) {
-			reportPath = System.getProperty("ReportPath");
+		if(System.getProperty("autopia.report.path") != null) {
+			reportPath = System.getProperty("autopia.report.path");
 		} else {
 			reportPath = TimeStamp.getInstance();
 		}
@@ -330,13 +332,13 @@ public abstract class DriverScript {
 							"_" + testParameters.getCurrentTestInstance();
 		
 		reportSettings = new ReportSettings(reportPath, reportName);
-		reportSettings.setDateFormatString(properties.getProperty("DateFormatString"));
-		reportSettings.setLogLevel(Integer.parseInt(properties.getProperty("LogLevel")));
-		reportSettings.setProjectName(properties.getProperty("ProjectName"));
-		reportSettings.setGenerateExcelReports(Boolean.parseBoolean(properties.getProperty("ExcelReport")));
-		reportSettings.setGenerateHtmlReports(Boolean.parseBoolean(properties.getProperty("HtmlReport")));
+		reportSettings.setDateFormatString(properties.getProperty("date.format.string"));
+		reportSettings.setLogLevel(Integer.parseInt(properties.getProperty("report.level")));
+		reportSettings.setProjectName(properties.getProperty("project.name"));
+		reportSettings.setGenerateExcelReports(Boolean.parseBoolean(properties.getProperty("report.excel.enable")));
+		reportSettings.setGenerateHtmlReports(Boolean.parseBoolean(properties.getProperty("report.html.enable")));
 		reportSettings.setConsolidateScreenshotsInWordDoc(
-				Boolean.parseBoolean(properties.getProperty("ConsolidateScreenshotsInWordDoc")));
+				Boolean.parseBoolean(properties.getProperty("report.screenshots.consolidate.worddoc")));
 		if (testParameters.getBrowser().equals(Browser.HTML_UNIT)) {
 			// Screenshots not supported in headless mode
 			reportSettings.setLinkScreenshotsToTestLog(false);
@@ -350,7 +352,7 @@ public abstract class DriverScript {
 									" - " + reportSettings.getReportName() +
 									" Automation Execution Results");
 		report.addTestLogSubHeading("Date & Time",
-										": " + Util.getFormattedTime(startTime, properties.getProperty("DateFormatString")),
+										": " + Util.getFormattedTime(startTime, properties.getProperty("date.format.string")),
 										"Iteration Mode", ": " + testParameters.getIterationMode());
 		report.addTestLogSubHeading("Start Iteration", ": " + testParameters.getStartIteration(),
 									"End Iteration", ": " + testParameters.getEndIteration());
@@ -385,10 +387,10 @@ public abstract class DriverScript {
 			
 		case PERFECTO_DEVICE:
             report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-            		"Executed on", ": " + "Perfecto MobileCloud @ " + properties.getProperty("PerfectoHost")); 
+            		"Executed on", ": " + "Perfecto MobileCloud @ " + testParameters.getRemoteUrl()); 
             report.addTestLogSubHeading("Device Name/ID", ": " + testParameters.getDeviceName() +
             		" (" + testParameters.getPerfectoDeviceId() + ")",
-            		"Perfecto User", ": " + properties.getProperty("PerfectoUser")); 
+            		"Perfecto User", ": " + properties.getProperty("perfecto.username")); 
             break;
             
 		case APPIUM_DEVICE:
@@ -427,7 +429,7 @@ public abstract class DriverScript {
 					Status.DONE);
 			currentIteration = testParameters.getEndIteration();
 		} else {
-			OnError onError = OnError.valueOf(properties.getProperty("OnError"));
+			OnError onError = OnError.valueOf(properties.getProperty("on.error"));
 			switch(onError) {
 			// Stop option is not relevant when run from HP ALM
 			case NEXT_ITERATION:

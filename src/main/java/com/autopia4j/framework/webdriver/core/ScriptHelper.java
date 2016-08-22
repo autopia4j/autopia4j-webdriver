@@ -42,8 +42,8 @@ public class ScriptHelper {
 		this.driver = driver;
 		
 		Properties properties = Settings.getInstance();
-		objectSyncTimeout = Long.parseLong(properties.get("ObjectSyncTimeout").toString());
-		pageLoadTimeout = Long.parseLong(properties.get("PageLoadTimeout").toString());
+		objectSyncTimeout = Long.parseLong(properties.get("timeout.object.sync").toString());
+		pageLoadTimeout = Long.parseLong(properties.get("timeout.page.load").toString());
 		
 		driverUtil = new WebDriverUtil(driver, objectSyncTimeout, pageLoadTimeout);
 		galenUtil = new GalenUtil(driver, report);

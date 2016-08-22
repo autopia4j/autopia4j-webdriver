@@ -62,7 +62,7 @@ public class KeywordDriverScript extends DriverScript {
 	protected int getNumberOfIterations() {
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
-		testDataAccess.setDatasheetName(properties.getProperty("DefaultDataSheet"));
+		testDataAccess.setDatasheetName(properties.getProperty("datatable.default.sheet"));
 		
 		int startRowNum = testDataAccess.getRowNum(testParameters.getCurrentTestcase(), 0);
 		int nTestcaseRows = testDataAccess.getRowCount(testParameters.getCurrentTestcase(), 0, startRowNum);
@@ -74,7 +74,7 @@ public class KeywordDriverScript extends DriverScript {
 		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
-				Boolean.parseBoolean(properties.getProperty("IncludeTestDataInReport"));
+				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
 		if (includeTestDataInReport) {
 			runTimeDatatablePath = reportPath + Util.getFileSeparator() + "datatables";
 			
@@ -121,7 +121,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 		
 		dataTable = new KeywordDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
-		dataTable.setDataReferenceIdentifier(properties.getProperty("DataReferenceIdentifier"));
+		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 	}
 	
 	private void initializeTestScript() {

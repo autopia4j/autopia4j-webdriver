@@ -45,14 +45,14 @@ public class Allocator {
 		resultSummaryManager.initializeTestBatch(runConfiguration,
 													executionEnvironment);
 		
-		int nThreads = Integer.parseInt(properties.getProperty("NumberOfThreads"));
+		int nThreads = Integer.parseInt(properties.getProperty("allocator.threads.count"));
 		resultSummaryManager.initializeSummaryReport(nThreads);
 		
 		int testBatchStatus = executeTestBatch(nThreads);
 		
 		resultSummaryManager.wrapUp(false);
 		
-		if (System.getProperty("ReportPath") == null) {	// No Report path specified from outside
+		if (System.getProperty("autopia.report.path") == null) {	// No Report path specified from outside
 			resultSummaryManager.launchResultSummary();
 		}
 		
@@ -60,18 +60,18 @@ public class Allocator {
 	}
 	
 	private String getRunConfiguration() {
-		if (System.getProperty("RunConfiguration") != null) {
-			return System.getProperty("RunConfiguration");
+		if (System.getProperty("autopia.run.configuration") != null) {
+			return System.getProperty("autopia.run.configuration");
 		} else {
-			return properties.getProperty("RunConfiguration");
+			return properties.getProperty("run.configuration");
 		}
 	}
 	
 	private String getExecutionEnvironment() {
-		if (System.getProperty("ExecutionEnvironment") != null) {
-			return System.getProperty("ExecutionEnvironment");
+		if (System.getProperty("autopia.execution.environment") != null) {
+			return System.getProperty("autopia.execution.environment");
 		} else {
-			return properties.getProperty("ExecutionEnvironment");
+			return properties.getProperty("execution.environment");
 		}
 	}
 	
@@ -142,35 +142,35 @@ public class Allocator {
 				if (!"".equals(executionMode)) {
 					testParameters.setExecutionMode(ExecutionMode.valueOf(executionMode));
 				} else {
-					testParameters.setExecutionMode(ExecutionMode.valueOf(properties.getProperty("DefaultExecutionMode")));
+					testParameters.setExecutionMode(ExecutionMode.valueOf(properties.getProperty("execution.mode.default")));
 				}
 				
 				String remoteUrl = runManagerAccess.getValue(currentTestInstance, "RemoteUrl");
 				if (!"".equals(remoteUrl) && !"N/A".equals(remoteUrl)) {
 					testParameters.setRemoteUrl(remoteUrl);
 				} else {
-					testParameters.setRemoteUrl(properties.getProperty("DefaultRemoteUrl"));
+					testParameters.setRemoteUrl(properties.getProperty("remote.url.default"));
 				}
 				
 				String deviceType = runManagerAccess.getValue(currentTestInstance, "DeviceType");
 				if (!"".equals(deviceType)) {
 					testParameters.setDeviceType(DeviceType.valueOf(deviceType));
 				} else {
-					testParameters.setDeviceType(DeviceType.valueOf(properties.getProperty("DefaultDeviceType")));
+					testParameters.setDeviceType(DeviceType.valueOf(properties.getProperty("device.type.default")));
 				}
 				
 				String deviceName = runManagerAccess.getValue(currentTestInstance, "DeviceName");
 				if (!"".equals(deviceName) && !"N/A".equals(deviceName)) {
 					testParameters.setDeviceName(deviceName);
 				} else {
-					testParameters.setDeviceName(properties.getProperty("DefaultDeviceName"));
+					testParameters.setDeviceName(properties.getProperty("device.name.default"));
 				}
 				
 				String browser = runManagerAccess.getValue(currentTestInstance, "Browser");
 				if (!"".equals(browser)) {
 					testParameters.setBrowser(Browser.valueOf(browser));
 				} else {
-					testParameters.setBrowser(Browser.valueOf(properties.getProperty("DefaultBrowser")));
+					testParameters.setBrowser(Browser.valueOf(properties.getProperty("browser.default")));
 				}
 				String browserVersion = runManagerAccess.getValue(currentTestInstance, "BrowserVersion");
 				if (!"".equals(browserVersion)) {
@@ -180,7 +180,7 @@ public class Allocator {
 				if (!"".equals(platform)) {
 					testParameters.setPlatform(Platform.valueOf(platform));
 				} else {
-					testParameters.setPlatform(Platform.valueOf(properties.getProperty("DefaultPlatform")));
+					testParameters.setPlatform(Platform.valueOf(properties.getProperty("platform.default")));
 				}
 				
 				testInstancesToRun.add(testParameters);

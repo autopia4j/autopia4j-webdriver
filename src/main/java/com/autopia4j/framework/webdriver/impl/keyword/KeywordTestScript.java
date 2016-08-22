@@ -63,19 +63,19 @@ public abstract class KeywordTestScript {
 	}
 	
 	private String getRunConfiguration(ITestContext testContext) {
-		if (System.getProperty("RunConfiguration") != null) {
-			return System.getProperty("RunConfiguration");
+		if (System.getProperty("autopia.run.configuration") != null) {
+			return System.getProperty("autopia.run.configuration");
 		} else {
 			return testContext.getSuite().getName();
 		}
 	}
 	
 	private String getExecutionEnvironment() {
-		if (System.getProperty("ExecutionEnvironment") != null) {
-			return System.getProperty("ExecutionEnvironment");
+		if (System.getProperty("autopia.execution.environment") != null) {
+			return System.getProperty("autopia.execution.environment");
 		} else {
 			Properties properties = Settings.getInstance();
-			return properties.getProperty("ExecutionEnvironment");
+			return properties.getProperty("execution.environment");
 		}
 	}
 	

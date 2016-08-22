@@ -78,7 +78,7 @@ public class ResultSummaryManager {
 		
 		frameworkParameters.setRunConfiguration(runConfiguration);
 		frameworkParameters.setExecutionEnvironment(executionEnvironment);
-		frameworkParameters.setDateFormatString(properties.getProperty("DateFormatString"));
+		frameworkParameters.setDateFormatString(properties.getProperty("date.format.string"));
 	}
 	
 	/**
@@ -88,7 +88,7 @@ public class ResultSummaryManager {
 	public void initializeSummaryReport(int nThreads) {
 		initializeReportSettings();
 		ReportTheme reportTheme =
-				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("ReportsTheme")));
+				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("report.theme")));
 		
 		summaryReport = new WebDriverReport(reportSettings, reportTheme);
 		
@@ -99,18 +99,18 @@ public class ResultSummaryManager {
 	}
 	
 	private void initializeReportSettings() {
-		if(System.getProperty("ReportPath") != null) {
-			reportPath = System.getProperty("ReportPath");
+		if(System.getProperty("autopia.report.path") != null) {
+			reportPath = System.getProperty("autopia.report.path");
 		} else {
 			reportPath = TimeStamp.getInstance();
 		}
 		
 		reportSettings = new ReportSettings(reportPath, "Summary");
 		
-		reportSettings.setDateFormatString(properties.getProperty("DateFormatString"));
-		reportSettings.setProjectName(properties.getProperty("ProjectName"));
-		reportSettings.setGenerateExcelReports(Boolean.parseBoolean(properties.getProperty("ExcelReport")));
-		reportSettings.setGenerateHtmlReports(Boolean.parseBoolean(properties.getProperty("HtmlReport")));
+		reportSettings.setDateFormatString(properties.getProperty("date.format.string"));
+		reportSettings.setProjectName(properties.getProperty("project.name"));
+		reportSettings.setGenerateExcelReports(Boolean.parseBoolean(properties.getProperty("report.excel.enable")));
+		reportSettings.setGenerateHtmlReports(Boolean.parseBoolean(properties.getProperty("report.html.enable")));
 		reportSettings.setLinkTestLogsToSummary(true);
 	}
 	
@@ -119,8 +119,8 @@ public class ResultSummaryManager {
 											" - Automation Execution Results Summary");
 		summaryReport.addResultSummarySubHeading("Date & Time",
 								": " + Util.getFormattedTime(overallStartTime,
-								properties.getProperty("DateFormatString")),
-								"OnError", ": " + properties.getProperty("OnError"));
+								properties.getProperty("date.format.string")),
+								"OnError", ": " + properties.getProperty("on.error"));
 		summaryReport.addResultSummarySubHeading("Run Configuration",
 								": " + frameworkParameters.getRunConfiguration(),
 								"No. of threads", ": " + nThreads);
@@ -151,7 +151,7 @@ public class ResultSummaryManager {
 				Util.getTimeDifference(overallStartTime, overallEndTime);
 		summaryReport.addResultSummaryFooter(totalExecutionTime);
 		
-		if(testExecutedInUnitTestFramework && System.getProperty("ReportPath") == null) {
+		if(testExecutedInUnitTestFramework && System.getProperty("autopia.report.path") == null) {
 			copyTestNgResults();
 		}
 		
@@ -161,12 +161,12 @@ public class ResultSummaryManager {
 	private void copyTestNgResults() {
 		File testNgResultSrc = new File(frameworkParameters.getBasePath() +
 										Util.getFileSeparator() +
-										properties.getProperty("TestNgReportPath") +
+										properties.getProperty("report.testng.path") +
 										Util.getFileSeparator() +
 										frameworkParameters.getRunConfiguration());		
 		File testNgResultCssFile = new File(frameworkParameters.getBasePath() +
 										Util.getFileSeparator() +
-										properties.getProperty("TestNgReportPath") +
+										properties.getProperty("report.testng.path") +
 										Util.getFileSeparator() +
 										"testng.css");
 		File testNgResultDest =

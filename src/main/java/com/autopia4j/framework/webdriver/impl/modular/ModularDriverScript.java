@@ -74,7 +74,7 @@ public class ModularDriverScript extends DriverScript {
 	protected int getNumberOfIterations() {
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
-		testDataAccess.setDatasheetName(properties.getProperty("DefaultDataSheet"));
+		testDataAccess.setDatasheetName(properties.getProperty("datatable.default.sheet"));
 		return testDataAccess.getRowCount(testParameters.getCurrentTestcase(), 0);
 	}
 	
@@ -82,7 +82,7 @@ public class ModularDriverScript extends DriverScript {
 		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
-				Boolean.parseBoolean(properties.getProperty("IncludeTestDataInReport"));
+				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
 		if (includeTestDataInReport) {
 			runTimeDatatablePath = reportPath + Util.getFileSeparator() + "datatables";
 			
@@ -129,7 +129,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 		
 		dataTable = new ModularDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
-		dataTable.setDataReferenceIdentifier(properties.getProperty("DataReferenceIdentifier"));
+		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 		
 		// Initialize the datatable row in case test data is required during the setUp()
 		dataTable.setCurrentRow(testParameters.getCurrentTestcase(), currentIteration);
