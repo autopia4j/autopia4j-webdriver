@@ -171,13 +171,10 @@ public class KeywordDriverScript extends DriverScript {
 				logger.info("Executing the business flow for the specified test script");
 				executeTestScript(businessFlowData);
 			} catch (AutopiaException fx) {
-				logger.error("Error during test execution", fx);
 				exceptionHandler(fx, fx.getErrorName());
 			} catch (InvocationTargetException ix) {
-				logger.error("Error during test execution", ix);
-				exceptionHandler((Exception)ix.getCause(), "Error");
+				exceptionHandler(ix, "Error");
 			} catch (Exception ex) {
-				logger.error("Error during test execution", ex);
 				exceptionHandler(ex, "Error");
 			}
 			

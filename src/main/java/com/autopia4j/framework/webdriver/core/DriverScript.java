@@ -421,6 +421,9 @@ public abstract class DriverScript {
 			report.updateTestLog(exceptionName, exceptionDescription, Status.FAIL, true);
 		}
 		
+		// Error logging
+		logger.error("Error during test execution", ex);
+		
 		// Error response
 		report.addTestLogSubSection("ErrorResponse");
 		if (frameworkParameters.getStopExecution()) {
