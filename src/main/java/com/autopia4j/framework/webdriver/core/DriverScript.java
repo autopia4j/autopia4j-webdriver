@@ -28,6 +28,7 @@ import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverUtil;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverFactory;
+import com.autopia4j.framework.webdriver.utils.WebDriverProxy;
 
 /**
  * Abstract class that implements the core logic of the autopia4j framework for WebDriver 
@@ -206,28 +207,34 @@ public abstract class DriverScript {
 	
 	protected void initializeWebDriver() {
 		logger.info("Initializing WebDriver");
+		
 		switch(testParameters.getExecutionMode()) {
 		case LOCAL:
+			initializeWebDriverFactory();
 			driver = WebDriverFactory.getWebDriver(testParameters.getBrowser());
 			break;
 			
 		case REMOTE:
+			initializeWebDriverFactory();
 			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
 															testParameters.getRemoteUrl());
 			break;
 			
 		case LOCAL_EMULATED_DEVICE:
+			initializeWebDriverFactory();
 			testParameters.setBrowser(Browser.CHROME);	// Mobile emulation supported only on Chrome
 			driver = WebDriverFactory.getEmulatedWebDriver(testParameters.getDeviceName());
 			break;
 			
 		case REMOTE_EMULATED_DEVICE:
+			initializeWebDriverFactory();
 			testParameters.setBrowser(Browser.CHROME);	// Mobile emulation supported only on Chrome
 			driver = WebDriverFactory.getEmulatedRemoteWebDriver(testParameters.getDeviceName(), 
 																	testParameters.getRemoteUrl());
 			break;
 			
 		case GRID:
+			initializeWebDriverFactory();
 			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
 													testParameters.getBrowserVersion(),
 													testParameters.getPlatform(),
@@ -235,6 +242,7 @@ public abstract class DriverScript {
 			break;
 			
 		case PERFECTO_DEVICE:
+			initializePerfectoWebDriverFactory();
 			driver = PerfectoWebDriverFactory.getPerfectoRemoteWebDriver(testParameters.getPerfectoDeviceId(),
 																testParameters.getDeviceType(),
 																testParameters.getBrowser(),
@@ -263,6 +271,38 @@ public abstract class DriverScript {
 		if(testParameters.getDeviceType().getValue().contains("desktop")) {
 			driver.manage().window().maximize();
 		}
+	}
+	
+	private void initializeWebDriverFactory() {
+		logger.info("Initializing WebDriverFactory");
+		
+		WebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates")));
+		WebDriverFactory.setIntroduceFlakinessInternetExplorer(Boolean.parseBoolean(properties.getProperty("IntroduceFlakinessInternetExplorer")));
+		WebDriverFactory.setTurnOffPopupBlockerInternetExplorer(Boolean.parseBoolean(properties.getProperty("TurnOffPopupBlockerInternetExplorer")));
+		
+		Boolean proxyRequired = Boolean.parseBoolean(properties.getProperty("ProxyRequired"));
+		WebDriverFactory.setProxyRequired(proxyRequired);
+		
+		if (proxyRequired) {
+			WebDriverProxy proxy = new WebDriverProxy();
+			proxy.setHost(properties.getProperty("ProxyHost"));
+			proxy.setPort(Integer.parseInt(properties.getProperty("ProxyPort")));
+			
+			Boolean authRequired = Boolean.parseBoolean(properties.getProperty("ProxyAuthenticationRequired"));
+			proxy.setAuthRequired(authRequired);
+			if(authRequired) {
+				proxy.setDomain(properties.getProperty("Domain"));
+				proxy.setUserName(properties.getProperty("Username"));
+				proxy.setPassword(properties.getProperty("Password"));
+			}
+			WebDriverFactory.setProxy(proxy);
+		}
+	}
+	
+	private void initializePerfectoWebDriverFactory() {
+		PerfectoWebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates")));
+		PerfectoWebDriverFactory.setUserName(properties.getProperty("PerfectoUser"));
+		PerfectoWebDriverFactory.setPassword(properties.getProperty("PerfectoPassword"));
 	}
 	
 	protected void initializeTestReport() {

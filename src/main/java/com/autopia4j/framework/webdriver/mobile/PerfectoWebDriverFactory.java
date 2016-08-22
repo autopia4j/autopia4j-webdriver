@@ -3,14 +3,11 @@ package com.autopia4j.framework.webdriver.mobile;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.core.AutopiaException;
-import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.Browser;
 import com.autopia4j.framework.webdriver.core.DeviceType;
@@ -21,7 +18,22 @@ import com.autopia4j.framework.webdriver.core.DeviceType;
  * @author vj
  */
 public class PerfectoWebDriverFactory {
-	private static Properties properties;
+	private static Boolean acceptAllSslCertificates = false;
+	private static String userName;
+	private static String password;
+	
+	public static void setUserName(String userName) {
+		PerfectoWebDriverFactory.userName = userName;
+	}
+	
+	public static void setPassword(String password) {
+		PerfectoWebDriverFactory.password = password;
+	}
+	
+	public static void setAcceptAllSslCertificates(Boolean acceptAllSslCertificates) {
+		PerfectoWebDriverFactory.acceptAllSslCertificates = acceptAllSslCertificates;
+	}
+	
 	
 	private PerfectoWebDriverFactory() {
 		// To prevent external instantiation of this class
@@ -61,13 +73,8 @@ public class PerfectoWebDriverFactory {
 		desiredCapabilities.setPlatform(Platform.ANY);
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		properties = Settings.getInstance();
-		
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
-		desiredCapabilities.setCapability("user", properties.getProperty("PerfectoUser"));
-		desiredCapabilities.setCapability("password", properties.getProperty("PerfectoPassword"));
+		desiredCapabilities.setCapability("user", userName);
+		desiredCapabilities.setCapability("password", password);
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
 		return desiredCapabilities;

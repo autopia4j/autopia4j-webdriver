@@ -78,6 +78,7 @@ public class ResultSummaryManager {
 		
 		frameworkParameters.setRunConfiguration(runConfiguration);
 		frameworkParameters.setExecutionEnvironment(executionEnvironment);
+		frameworkParameters.setDateFormatString(properties.getProperty("DateFormatString"));
 	}
 	
 	/**

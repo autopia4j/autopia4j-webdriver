@@ -3,8 +3,6 @@ package com.autopia4j.framework.webdriver.utils;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.Proxy.ProxyType;
@@ -24,8 +22,6 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.*;
 
 import com.autopia4j.framework.core.AutopiaException;
-import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.Browser;
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -45,7 +41,33 @@ import io.github.bonigarcia.wdm.PhantomJsDriverManager;
  */
 public class WebDriverFactory {
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebDriverFactory.class);
-	private static Properties properties;
+	
+	private static Boolean proxyRequired = false;
+	private static WebDriverProxy proxy;
+	private static Boolean acceptAllSslCertificates = false;
+	private static Boolean introduceFlakinessInternetExplorer = false;
+	private static Boolean turnOffPopupBlockerInternetExplorer = false;
+	
+	public static void setProxyRequired(Boolean proxyRequired) {
+		WebDriverFactory.proxyRequired = proxyRequired;
+	}
+	
+	public static void setProxy(WebDriverProxy proxy) {
+		WebDriverFactory.proxy = proxy;
+	}
+	
+	public static void setAcceptAllSslCertificates(Boolean acceptAllSslCertificates) {
+		WebDriverFactory.acceptAllSslCertificates = acceptAllSslCertificates;
+	}
+	
+	public static void setIntroduceFlakinessInternetExplorer(Boolean introduceFlakinessInternetExplorer) {
+		WebDriverFactory.introduceFlakinessInternetExplorer = introduceFlakinessInternetExplorer;
+	}
+	
+	public static void setTurnOffPopupBlockerInternetExplorer(Boolean turnOffPopupBlockerInternetExplorer) {
+		WebDriverFactory.turnOffPopupBlockerInternetExplorer = turnOffPopupBlockerInternetExplorer;
+	}
+	
 	
 	private WebDriverFactory() {
 		// To prevent external instantiation of this class
@@ -82,13 +104,7 @@ public class WebDriverFactory {
 			break;
 			
 		case HTML_UNIT:
-			// Does not take the system proxy settings automatically!
-			
-			properties = Settings.getInstance();
-			boolean proxyRequired =
-					Boolean.parseBoolean(properties.getProperty("ProxyRequired"));
-			
-			if (proxyRequired) {
+			if (proxyRequired) {	// Does not take the system proxy settings automatically!
 				driver = getHtmlUnitDriverWithProxy();
 			} else {
 				driver = new HtmlUnitDriver(true);
@@ -117,10 +133,6 @@ public class WebDriverFactory {
 	private static WebDriver getChromeDriver() {
 		// Takes the system proxy settings automatically
 		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
@@ -131,10 +143,6 @@ public class WebDriverFactory {
 	private static WebDriver getEdgeDriver() {
 		// Takes the system proxy settings automatically
 		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.edge();
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
@@ -144,10 +152,6 @@ public class WebDriverFactory {
 	
 	private static WebDriver getFirefoxDriver() {
 		// Takes the system proxy settings automatically
-		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
 		
 		// Sample code to specify path of Firefox binaries
 		//System.setProperty("webdriver.firefox.bin",
@@ -160,10 +164,6 @@ public class WebDriverFactory {
 	
 	private static WebDriver getMarionetteDriver() {
 		// Takes the system proxy settings automatically
-		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
 		
 		FirefoxProfile marionetteProfile = new FirefoxProfile();
 		marionetteProfile.setAcceptUntrustedCertificates(acceptAllSslCertificates);
@@ -179,10 +179,6 @@ public class WebDriverFactory {
 	private static WebDriver getPhantomJsDriver() {
 		// Takes the system proxy settings automatically (I think!)
 		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.phantomjs();
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
@@ -192,21 +188,19 @@ public class WebDriverFactory {
 	
 	private static WebDriver getHtmlUnitDriverWithProxy() {
 		WebDriver driver;
-		boolean proxyAuthenticationRequired =
-				Boolean.parseBoolean(properties.getProperty("ProxyAuthenticationRequired"));
 		
-		if(proxyAuthenticationRequired) {
+		if(proxy.isAuthRequired()) {
 			// NTLM authentication for proxy supported
 			
 			driver = new HtmlUnitDriver(true) {
 			@Override
 			protected WebClient modifyWebClient(WebClient client) {
 				DefaultCredentialsProvider credentialsProvider = new DefaultCredentialsProvider();
-				credentialsProvider.addNTLMCredentials(properties.getProperty("Username"),
-														properties.getProperty("Password"),
-														properties.getProperty("ProxyHost"),
-														Integer.parseInt(properties.getProperty("ProxyPort")),
-														"", properties.getProperty("Domain"));
+				credentialsProvider.addNTLMCredentials(proxy.getUserName(),
+														proxy.getPassword(),
+														proxy.getHost(),
+														proxy.getPort(),
+														"", proxy.getDomain());
 				client.setCredentialsProvider(credentialsProvider);
 				return client;
 				}
@@ -215,31 +209,22 @@ public class WebDriverFactory {
 			driver = new HtmlUnitDriver(true);
 		}
 		
-		((HtmlUnitDriver) driver).setProxy(properties.getProperty("ProxyHost"),
-									Integer.parseInt(properties.getProperty("ProxyPort")));
+		((HtmlUnitDriver) driver).setProxy(proxy.getHost(), proxy.getPort());
 		return driver;
 	}
 	
 	private static WebDriver getInternetExplorerDriver() {
 		// Takes the system proxy settings automatically
 		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		boolean introduceFlakiness =
-				Boolean.parseBoolean(properties.getProperty("IntroduceFlakinessInternetExplorer"));
-		boolean turnOffPopupBlocker =
-				Boolean.parseBoolean(properties.getProperty("TurnOffPopupBlockerInternetExplorer"));
-		
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.internetExplorer();
 		//desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.ACCEPT);
 		//desiredCapabilities.setCapability(CapabilityType.HAS_NATIVE_EVENTS, false);
 		desiredCapabilities.setCapability("nativeEvents", false);
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
-		desiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, introduceFlakiness);
+		desiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, introduceFlakinessInternetExplorer);
 		//desiredCapabilities.setCapability("ignoreProtectedModeSettings", introduceFlakiness);
 		
-		if(turnOffPopupBlocker) {
+		if(turnOffPopupBlockerInternetExplorer) {
 			String cmd = "REG ADD \"HKEY_CURRENT_USER\\Software\\Microsoft\\Internet Explorer\\New Windows\" /F /V \"PopupMgr\" /T REG_SZ /D \"no\"";
 			try {
 			    Runtime.getRuntime().exec(cmd);
@@ -259,10 +244,6 @@ public class WebDriverFactory {
 		// Does not take the system proxy settings automatically!
 		// NTLM authentication for proxy NOT supported
 		
-		properties = Settings.getInstance();
-		boolean proxyRequired =
-				Boolean.parseBoolean(properties.getProperty("ProxyRequired"));
-		
 		OperaDriverManager.getInstance().setup();
 		WebDriver driver;
 		if (proxyRequired) {
@@ -277,10 +258,6 @@ public class WebDriverFactory {
 	private static WebDriver getSafariDriver() {
 		// Takes the system proxy settings automatically
 		
-		properties = Settings.getInstance();
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
 		DesiredCapabilities desiredCapabilities = DesiredCapabilities.safari();
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
@@ -288,9 +265,7 @@ public class WebDriverFactory {
 	}
 	
 	private static DesiredCapabilities getProxyCapabilities() {
-		properties = Settings.getInstance();
-		String proxyUrl = properties.getProperty("ProxyHost") + ":" +
-									properties.getProperty("ProxyPort");
+		String proxyUrl = proxy.getHost() + ":" + proxy.getPort();
 		
 		Proxy proxy = new Proxy();
 		proxy.setProxyType(ProxyType.MANUAL);
@@ -320,12 +295,6 @@ public class WebDriverFactory {
 		// java -Dwebdriver.chrome.driver=/path/to/driver -jar selenium-server-standalone.jar
 		// java -Dwebdriver.ie.driver=/path/to/driver -jar selenium-server-standalone.jar
 		
-		properties = Settings.getInstance();
-		boolean proxyRequired =
-				Boolean.parseBoolean(properties.getProperty("ProxyRequired"));
-		boolean acceptAllSslCertificates =
-				Boolean.parseBoolean(properties.getProperty("AcceptAllSslCertificates"));
-		
 		DesiredCapabilities desiredCapabilities;
 		if ((browser.equals(Browser.HTML_UNIT) || browser.equals(Browser.OPERA))
 																&& proxyRequired) {
@@ -337,9 +306,7 @@ public class WebDriverFactory {
 		desiredCapabilities.setBrowserName(browser.getValue());
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		if (browser.equals(Browser.INTERNET_EXPLORER)) {
-			boolean introduceFlakiness =
-					Boolean.parseBoolean(properties.getProperty("IntroduceFlakinessInternetExplorer"));
-			desiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, introduceFlakiness);
+			desiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, introduceFlakinessInternetExplorer);
 		}
 		
 		if (browserVersion != null) {
@@ -372,7 +339,6 @@ public class WebDriverFactory {
 	public static WebDriver getEmulatedWebDriver(String deviceName) {
 		DesiredCapabilities desiredCapabilities = getEmulatedChromeDriverCapabilities(deviceName);
 		
-		properties = Settings.getInstance();
 		ChromeDriverManager.getInstance().setup();
 		return new ChromeDriver(desiredCapabilities);
 	}
@@ -418,7 +384,6 @@ public class WebDriverFactory {
 						getEmulatedChromeDriverCapabilities(deviceWidth, deviceHeight,
 															devicePixelRatio, userAgent);
 		
-		properties = Settings.getInstance();
 		ChromeDriverManager.getInstance().setup();
 		return new ChromeDriver(desiredCapabilities);
 	}
@@ -453,14 +418,12 @@ public class WebDriverFactory {
 	 * @return The corresponding {@link RemoteWebDriver} object
 	 */
 	public static WebDriver getEmulatedRemoteWebDriver(int deviceWidth, int deviceHeight,
-								float devicePixelRatio, String userAgent, String remoteUrl) {
+								float devicePixelRatio, String userAgent, URL remoteUrl) {
 		DesiredCapabilities desiredCapabilities =
 				getEmulatedChromeDriverCapabilities(deviceWidth, deviceHeight,
 													devicePixelRatio, userAgent);
 		desiredCapabilities.setJavascriptEnabled(true);	// Pre-requisite for remote execution
 		
-		URL url = Util.getUrl(remoteUrl);
-		
-		return new RemoteWebDriver(url, desiredCapabilities);
+		return new RemoteWebDriver(remoteUrl, desiredCapabilities);
 	}
 }
