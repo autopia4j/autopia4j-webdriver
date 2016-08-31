@@ -44,21 +44,6 @@ public class KeywordDriverScript extends DriverScript {
 	}
 	
 	@Override
-	public void driveTestExecution() {
-		startUp();
-		initializeTestIterations();
-		initializeWebDriver();
-		initializeTestReport();
-		initializeDatatable();
-		initializeTestScript();
-		
-		executeTestIterations();
-		
-		quitWebDriver();
-		wrapUp();
-	}
-	
-	@Override
 	protected int getNumberOfIterations() {
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
@@ -70,7 +55,8 @@ public class KeywordDriverScript extends DriverScript {
 		return nTestcaseRows / nSubIterations;
 	}
 	
-	private void initializeDatatable() {
+	@Override
+	protected void initializeDatatable() {
 		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
@@ -124,7 +110,8 @@ public class KeywordDriverScript extends DriverScript {
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 	}
 	
-	private void initializeTestScript() {
+	@Override
+	protected void initializeTestScript() {
 		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
 		initializeBusinessFlow();
@@ -162,6 +149,11 @@ public class KeywordDriverScript extends DriverScript {
 		}
 	}
 	
+	@Override
+	protected void executeTestScript() {
+		executeTestIterations();
+	}
+	
 	private void executeTestIterations() {
 		while(currentIteration <= testParameters.getEndIteration()) {
 			report.addTestLogSection("Iteration: " + Integer.toString(currentIteration));
@@ -169,7 +161,7 @@ public class KeywordDriverScript extends DriverScript {
 			// Evaluate each test iteration for any errors
 			try {
 				logger.info("Executing the business flow for the specified test script");
-				executeTestScript(businessFlowData);
+				executeBusinessFlow(businessFlowData);
 			} catch (AutopiaException fx) {
 				exceptionHandler(fx, fx.getErrorName());
 			} catch (InvocationTargetException ix) {
@@ -182,7 +174,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 	}
 	
-	private void executeTestScript(List<String> businessFlowData)
+	private void executeBusinessFlow(List<String> businessFlowData)
 			throws IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException, InstantiationException {
 		Map<String, Integer> keywordDirectory = new HashMap<>();

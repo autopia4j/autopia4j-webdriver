@@ -118,9 +118,21 @@ public abstract class DriverScript {
 	/**
 	 * Function to execute the given test case
 	 */
-	public abstract void driveTestExecution();
+	public void driveTestExecution() {
+		startUp();
+		initializeTestIterations();
+		initializeWebDriver();
+		initializeTestReport();
+		initializeDatatable();
+		initializeTestScript();
+		
+		executeTestScript();
+		
+		quitWebDriver();
+		wrapUp();
+	}
 	
-	protected void startUp() {
+	private void startUp() {
 		startTime = Util.getCurrentTime();
 		logger.info("Starting test execution");
 		
@@ -178,7 +190,7 @@ public abstract class DriverScript {
 		}
 	}
 	
-	protected void initializeTestIterations() {
+	private void initializeTestIterations() {
 		switch(testParameters.getIterationMode()) {
 		case RUN_ALL_ITERATIONS:
 			int nIterations = getNumberOfIterations();
@@ -205,7 +217,7 @@ public abstract class DriverScript {
 	
 	protected abstract int getNumberOfIterations();
 	
-	protected void initializeWebDriver() {
+	private void initializeWebDriver() {
 		logger.info("Initializing WebDriver");
 		
 		switch(testParameters.getExecutionMode()) {
@@ -307,7 +319,7 @@ public abstract class DriverScript {
 		PerfectoWebDriverFactory.setPassword(properties.getProperty("perfecto.password"));
 	}
 	
-	protected void initializeTestReport() {
+	private void initializeTestReport() {
 		logger.info("Initializing test log");
 		initializeReportSettings();
 		ReportTheme reportTheme =
@@ -407,6 +419,12 @@ public abstract class DriverScript {
 		report.addTestLogTableHeadings();
 	}
 	
+	protected abstract void initializeDatatable();
+	
+	protected abstract void initializeTestScript();
+	
+	protected abstract void executeTestScript();
+	
 	protected void exceptionHandler(Exception ex, String exceptionName) {
 		// Error reporting
 		String exceptionDescription = ex.getMessage();
@@ -462,7 +480,7 @@ public abstract class DriverScript {
 		}
 	}
 	
-	protected void quitWebDriver() {
+	private void quitWebDriver() {
 		logger.info("Quitting WebDriver");
 		report.addTestLogSubSection("CloseBrowser");
 		
@@ -480,7 +498,7 @@ public abstract class DriverScript {
 		}
 	}
 	
-	protected void wrapUp() {
+	private void wrapUp() {
 		endTime = Util.getCurrentTime();
 		closeTestReport();
 		logger.info("Test execution complete");

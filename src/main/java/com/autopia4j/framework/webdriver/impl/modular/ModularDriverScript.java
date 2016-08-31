@@ -34,31 +34,6 @@ public class ModularDriverScript extends DriverScript {
 	}
 	
 	@Override
-	public void driveTestExecution() {
-		startUp();
-		initializeTestIterations();
-		initializeWebDriver();
-		initializeTestReport();
-		initializeDatatable();
-		initializeTestScript();
-		
-		try {
-			logger.info("Executing setup for the specified test script");
-			testScript.setUp();
-			executeTestIterations();
-		} catch (AutopiaException fx) {
-			exceptionHandler(fx, fx.getErrorName());
-		}  catch (Exception ex) {
-			exceptionHandler(ex, "Error");
-		} finally {
-			logger.info("Executing tear-down for the specified test script");
-			testScript.tearDown();	// tearDown will ALWAYS be called
-		}
-		
-		quitWebDriver();
-		wrapUp();
-	}
-	
 	protected int getNumberOfIterations() {
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
@@ -66,7 +41,8 @@ public class ModularDriverScript extends DriverScript {
 		return testDataAccess.getRowCount(testParameters.getCurrentTestcase(), 0);
 	}
 	
-	private void initializeDatatable() {
+	@Override
+	protected void initializeDatatable() {
 		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
@@ -123,7 +99,8 @@ public class ModularDriverScript extends DriverScript {
 		dataTable.setCurrentRow(testParameters.getCurrentTestcase(), currentIteration);
 	}
 	
-	private void initializeTestScript() {
+	@Override
+	protected void initializeTestScript() {
 		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
 		testScript = getTestScriptInstance();
@@ -150,6 +127,22 @@ public class ModularDriverScript extends DriverScript {
 			String errorDescription = "Error while instantiating the specified test script";
 			logger.error(errorDescription, e);
 			throw new AutopiaException(errorDescription);
+		}
+	}
+	
+	@Override
+	protected void executeTestScript() {
+		try {
+			logger.info("Executing setup for the specified test script");
+			testScript.setUp();
+			executeTestIterations();
+		} catch (AutopiaException fx) {
+			exceptionHandler(fx, fx.getErrorName());
+		}  catch (Exception ex) {
+			exceptionHandler(ex, "Error");
+		} finally {
+			logger.info("Executing tear-down for the specified test script");
+			testScript.tearDown();	// tearDown will ALWAYS be called
 		}
 	}
 	
