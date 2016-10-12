@@ -62,8 +62,8 @@ public class ResultSummaryManager {
 	 * Function to set the absolute path of the framework (to be used as a base path) 
 	 */
 	public void setBasePath() {
-		String relativePath = new File(System.getProperty("user.dir")).getAbsolutePath();
-		frameworkParameters.setBasePath(relativePath);
+		String basePath = new File(System.getProperty("user.dir")).getAbsolutePath();
+		frameworkParameters.setBasePath(basePath);
 	}
 	
 	/**

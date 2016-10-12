@@ -1,13 +1,20 @@
 package com.autopia4j.framework.webdriver.utils;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.Augmenter;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -40,6 +47,41 @@ public class WebDriverUtil {
 		this.driver = driver;
 		this.objectSyncTimeout = objectSyncTimeout;
 		this.pageLoadTimeout = pageLoadTimeout;
+	}
+	
+	/**
+	 * Function to capture a screenshot of the current page
+	 * @return A byte array corresponding to the screenshot taken
+	 */
+	public byte[] captureScreenshotAsByteArray() {
+		TakesScreenshot screenshotCaptureDriver = getScreenshotCaptureDriver(driver);
+		return screenshotCaptureDriver.getScreenshotAs(OutputType.BYTES);
+	}
+	
+	private TakesScreenshot getScreenshotCaptureDriver(WebDriver driver) {
+		if (driver instanceof HtmlUnitDriver) {
+			return null;	// Screenshots not supported in headless mode
+		}
+		
+		if (driver instanceof RemoteWebDriver) {
+			Capabilities capabilities = ((RemoteWebDriver) driver).getCapabilities();
+			if ("htmlunit".equals(capabilities.getBrowserName())) {
+				return null;	// Screenshots not supported in headless mode
+			}
+			WebDriver augmentedDriver = new Augmenter().augment(driver);
+	        return ((TakesScreenshot) augmentedDriver);
+		} else {
+			return ((TakesScreenshot) driver);
+		}
+	}
+	
+	/**
+	 * Function to capture a screenshot of the current page
+	 * @return A file corresponding to the screenshot taken
+	 */
+	public File captureScreenshotAsFile() {
+		TakesScreenshot screenshotCaptureDriver = getScreenshotCaptureDriver(driver);
+		return screenshotCaptureDriver.getScreenshotAs(OutputType.FILE);
 	}
 	
 	/**

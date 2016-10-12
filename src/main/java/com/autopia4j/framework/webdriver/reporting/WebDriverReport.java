@@ -4,13 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.remote.Augmenter;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +12,7 @@ import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.reporting.Report;
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.ReportTheme;
+import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
 
 
 /**
@@ -50,22 +45,8 @@ public class WebDriverReport extends Report {
 		if (driver == null) {
 			throw new AutopiaException("The driver object is not initialized!");
 		}
-		
-		if (driver instanceof HtmlUnitDriver) {
-			return;	// Screenshots not supported in headless mode
-		}
-		
-		File scrFile;
-		if (driver instanceof RemoteWebDriver) {
-			Capabilities capabilities = ((RemoteWebDriver) driver).getCapabilities();
-			if ("htmlunit".equals(capabilities.getBrowserName())) {
-				return;	// Screenshots not supported in headless mode
-			}
-			WebDriver augmentedDriver = new Augmenter().augment(driver);
-	        scrFile = ((TakesScreenshot) augmentedDriver).getScreenshotAs(OutputType.FILE);
-		} else {
-			scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		}
+		WebDriverUtil driverUtil = new WebDriverUtil(driver, 0, 0);
+		File scrFile = driverUtil.captureScreenshotAsFile();
 		
 		try {
 			FileUtils.copyFile(scrFile, new File(screenshotPath), true);
