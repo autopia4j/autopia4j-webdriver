@@ -80,10 +80,10 @@ public abstract class ReusableLibrary {
 		driver = scriptHelper.getDriver();
 		driverUtil = scriptHelper.getDriverUtil();
 		galenUtil = scriptHelper.getGalenUtil();
-		objectSyncTimeout = scriptHelper.getObjectSyncTimeout();
-		pageLoadTimeout = scriptHelper.getPageLoadTimeout();
 		
 		properties = Settings.getInstance();
 		frameworkParameters = FrameworkParameters.getInstance();
+		objectSyncTimeout = frameworkParameters.getObjectSyncTimeout();
+		pageLoadTimeout = frameworkParameters.getPageLoadTimeout();
 	}
 }

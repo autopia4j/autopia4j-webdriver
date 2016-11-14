@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.webdriver.core.DriverScript;
+import com.autopia4j.framework.webdriver.core.TestBatchHarness;
+import com.autopia4j.framework.webdriver.impl.modular.ModularDriverScript;
+import com.autopia4j.framework.webdriver.impl.keyword.KeywordDriverScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
-import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 
 /**
  * Class to facilitate parallel execution of test scripts
@@ -54,12 +56,11 @@ class ParallelRunner implements Runnable {
 			
 			switch(frameworkParameters.getFrameworkType()) {
 			case KEYWORD_DRIVEN:
-				driverScript = new com.autopia4j.framework.webdriver.impl.keyword.KeywordDriverScript(this.testParameters);
+				driverScript = new KeywordDriverScript(this.testParameters);
 				break;
 				
 			case MODULAR:
-				driverScript = new com.autopia4j.framework.webdriver.impl.modular.ModularDriverScript(
-										this.testParameters);
+				driverScript = new ModularDriverScript(this.testParameters);
 				//TODO: Directly instantiate the test script class and pass it in here
 				break;
 				
@@ -85,8 +86,8 @@ class ParallelRunner implements Runnable {
 			}
 		}
 		
-		ResultSummaryManager resultSummaryManager = ResultSummaryManager.getInstance();
-		resultSummaryManager.updateResultSummary(testParameters, testReportName,
+		TestBatchHarness testBatchHarness = TestBatchHarness.getInstance();
+		testBatchHarness.updateResultSummary(testParameters, testReportName,
 															executionTime, testStatus);
 	}
 }

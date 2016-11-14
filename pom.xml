@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.autopia4j.framework</groupId>
   <artifactId>autopia4j-webdriver</artifactId>
-  <version>1.5.5</version>
+  <version>1.6.0</version>
   <name>autopia4j framework for webdriver</name>
   <description>autopia4j framework for webdriver</description>
   <build>
@@ -48,7 +48,7 @@
   	<dependency>
   		<groupId>com.autopia4j.framework</groupId>
   		<artifactId>autopia4j-core</artifactId>
-  		<version>1.1.4</version>
+  		<version>1.1.5</version>
   	</dependency>
   	<dependency>
   		<groupId>io.github.lukehutch</groupId>
@@ -69,6 +69,11 @@
   		<groupId>io.appium</groupId>
   		<artifactId>java-client</artifactId>
   		<version>4.0.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>info.cukes</groupId>
+  		<artifactId>cucumber-java</artifactId>
+  		<version>1.2.5</version>
   	</dependency>
   </dependencies>
   <properties>

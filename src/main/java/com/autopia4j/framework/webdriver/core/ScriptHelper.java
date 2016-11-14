@@ -1,10 +1,8 @@
 package com.autopia4j.framework.webdriver.core;
 
-import java.util.Properties;
-
 import org.openqa.selenium.WebDriver;
 
-import com.autopia4j.framework.core.Settings;
+import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.datatable.DataTableType;
 import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
@@ -23,8 +21,6 @@ public class ScriptHelper {
 	private final WebDriver driver;
 	private final WebDriverUtil driverUtil;
 	private final GalenUtil galenUtil;
-	private final long objectSyncTimeout;
-	private final long pageLoadTimeout;
 	
 	
 	/**
@@ -41,9 +37,9 @@ public class ScriptHelper {
 		this.report = report;
 		this.driver = driver;
 		
-		Properties properties = Settings.getInstance();
-		objectSyncTimeout = Long.parseLong(properties.get("timeout.object.sync").toString());
-		pageLoadTimeout = Long.parseLong(properties.get("timeout.page.load").toString());
+		FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
+		long objectSyncTimeout = frameworkParameters.getObjectSyncTimeout();
+		long pageLoadTimeout = frameworkParameters.getPageLoadTimeout();
 		
 		driverUtil = new WebDriverUtil(driver, objectSyncTimeout, pageLoadTimeout);
 		galenUtil = new GalenUtil(driver, report);
@@ -95,21 +91,5 @@ public class ScriptHelper {
 	 */
 	public GalenUtil getGalenUtil() {
 		return galenUtil;
-	}
-	
-	/**
-	 * Function to get the object synchronization timeout configured by the user
-	 * @return The object synchronization timeout (in seconds)
-	 */
-	public long getObjectSyncTimeout() {
-		return objectSyncTimeout;
-	}
-	
-	/**
-	 * Function to get the page load timeout configured by the user
-	 * @return The page load timeout (in seconds)
-	 */
-	public long getPageLoadTimeout() {
-		return pageLoadTimeout;
 	}
 }

@@ -12,12 +12,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.datatable.DataTableType;
+import com.autopia4j.framework.datatable.impl.ModularDatatable;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
+import com.autopia4j.framework.webdriver.core.TestBatchHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
-import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
@@ -35,9 +35,9 @@ public abstract class ModularTestScript {
 	protected DeviceType deviceType;
 	
 	/**
-	 * The {@link DataTableType} object (passed from the Driver script)
+	 * The {@link ModularDatatable} object (passed from the Driver script)
 	 */
-	protected DataTableType dataTable;
+	protected ModularDatatable dataTable;
 	/**
 	 * The {@link WebDriverReport} object (passed from the Driver script)
 	 */
@@ -61,13 +61,14 @@ public abstract class ModularTestScript {
 	protected ScriptHelper scriptHelper;
 	
 	/**
-	 * The {@link Properties} object with settings loaded from the framework properties file
-	 */
-	protected Properties properties;
-	/**
 	 * The {@link FrameworkParameters} object
 	 */
 	protected FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
+	
+	/**
+	 * The {@link Properties} object with settings loaded from the framework properties file
+	 */
+	protected Properties properties;
 	
 	/**
 	 * Object synchronization timeout
@@ -87,7 +88,7 @@ public abstract class ModularTestScript {
 	 */
 	protected String currentTest;
 	
-	private ResultSummaryManager resultSummaryManager = ResultSummaryManager.getInstance();
+	private TestBatchHarness testBatchHarness;
 	private ThreadLocal<ModularDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
@@ -100,13 +101,13 @@ public abstract class ModularTestScript {
 		this.scriptHelper = scriptHelper;
 		
 		deviceType = scriptHelper.getDeviceType();
-		dataTable = scriptHelper.getDataTable();
+		dataTable = (ModularDatatable) scriptHelper.getDataTable();
 		report = scriptHelper.getReport();
 		driver = scriptHelper.getDriver();
 		driverUtil = scriptHelper.getDriverUtil();
 		galenUtil = scriptHelper.getGalenUtil();
-		objectSyncTimeout = scriptHelper.getObjectSyncTimeout();
-		pageLoadTimeout = scriptHelper.getPageLoadTimeout();
+		objectSyncTimeout = frameworkParameters.getObjectSyncTimeout();
+		pageLoadTimeout = frameworkParameters.getPageLoadTimeout();
 	}
 	
 	/**
@@ -115,13 +116,13 @@ public abstract class ModularTestScript {
 	 */
 	@BeforeSuite
 	public void setUpTestSuite(ITestContext testContext) {
-		resultSummaryManager.setBasePath();
-		properties = Settings.getInstance();
+		testBatchHarness = TestBatchHarness.getInstance();
 		
-		String runConfiguration = getRunConfiguration(testContext);
-		String executionEnvironment = getExecutionEnvironment();
-		resultSummaryManager.initializeTestBatch(runConfiguration,
-													executionEnvironment);
+		if (System.getProperty("autopia.run.configuration") == null) {
+			System.setProperty("autopia.run.configuration", testContext.getSuite().getName());
+		}
+		testBatchHarness.initialize();
+		properties = Settings.getInstance();
 		
 		int nThreads;
 		if ("false".equalsIgnoreCase(testContext.getSuite().getParallel())) {
@@ -134,23 +135,7 @@ public abstract class ModularTestScript {
 		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
 		// This level of threading will not be reflected in the summary report
 		
-		resultSummaryManager.initializeSummaryReport(nThreads);
-	}
-	
-	private String getRunConfiguration(ITestContext testContext) {
-		if (System.getProperty("autopia.run.configuration") != null) {
-			return System.getProperty("autopia.run.configuration");
-		} else {
-			return testContext.getSuite().getName();
-		}
-	}
-	
-	private String getExecutionEnvironment() {
-		if (System.getProperty("autopia.execution.environment") != null) {
-			return System.getProperty("autopia.execution.environment");
-		} else {
-			return properties.getProperty("execution.environment");
-		}
+		testBatchHarness.initializeSummaryReport(nThreads);
 	}
 	
 	/**
@@ -212,7 +197,7 @@ public abstract class ModularTestScript {
 		String executionTime = driverScript.getExecutionTime();
 		String testStatus = driverScript.getTestStatus();
 		
-		resultSummaryManager.updateResultSummary(testParameters, testReportName,
+		testBatchHarness.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
 	}
 	
@@ -221,6 +206,6 @@ public abstract class ModularTestScript {
 	 */
 	@AfterSuite(alwaysRun=true)
 	public void tearDownTestSuite() {
-		resultSummaryManager.wrapUp(true);
+		testBatchHarness.wrapUp(true);
 	}
 }

@@ -1,12 +1,9 @@
 package com.autopia4j.framework.webdriver.impl.keyword;
 
-import java.util.Properties;
-
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.utils.Util;
+import com.autopia4j.framework.webdriver.core.TestBatchHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
-import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 
 import org.testng.Assert;
 import org.testng.ITestContext;
@@ -31,7 +28,7 @@ public abstract class KeywordTestScript {
 	 */
 	protected String currentTest;
 	
-	private ResultSummaryManager resultSummaryManager = ResultSummaryManager.getInstance();
+	private TestBatchHarness testBatchHarness;
 	private ThreadLocal<KeywordDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
@@ -41,12 +38,12 @@ public abstract class KeywordTestScript {
 	 */
 	@BeforeSuite
 	public void setUpTestSuite(ITestContext testContext) {
-		resultSummaryManager.setBasePath();
+		testBatchHarness = TestBatchHarness.getInstance();
 		
-		String runConfiguration = getRunConfiguration(testContext);
-		String executionEnvironment = getExecutionEnvironment();
-		resultSummaryManager.initializeTestBatch(runConfiguration,
-													executionEnvironment);
+		if (System.getProperty("autopia.run.configuration") == null) {
+			System.setProperty("autopia.run.configuration", testContext.getSuite().getName());
+		}
+		testBatchHarness.initialize();
 		
 		int nThreads;
 		if ("false".equalsIgnoreCase(testContext.getSuite().getParallel())) {
@@ -59,24 +56,7 @@ public abstract class KeywordTestScript {
 		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
 		// This level of threading will not be reflected in the summary report
 		
-		resultSummaryManager.initializeSummaryReport(nThreads);
-	}
-	
-	private String getRunConfiguration(ITestContext testContext) {
-		if (System.getProperty("autopia.run.configuration") != null) {
-			return System.getProperty("autopia.run.configuration");
-		} else {
-			return testContext.getSuite().getName();
-		}
-	}
-	
-	private String getExecutionEnvironment() {
-		if (System.getProperty("autopia.execution.environment") != null) {
-			return System.getProperty("autopia.execution.environment");
-		} else {
-			Properties properties = Settings.getInstance();
-			return properties.getProperty("execution.environment");
-		}
+		testBatchHarness.initializeSummaryReport(nThreads);
 	}
 	
 	/**
@@ -121,15 +101,15 @@ public abstract class KeywordTestScript {
 		String executionTime = driverScript.getExecutionTime();
 		String testStatus = driverScript.getTestStatus();
 		
-		resultSummaryManager.updateResultSummary(testParameters, testReportName,
+		testBatchHarness.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
 	}
 	
 	/**
-	 * Function to do the required framework teardown activities after executing the overall test suite
+	 * Function to do the required framework tear-down activities after executing the overall test suite
 	 */
-	@AfterSuite
+	@AfterSuite(alwaysRun=true)
 	public void tearDownTestSuite() {
-		resultSummaryManager.wrapUp(true);
+		testBatchHarness.wrapUp(true);
 	}
 }

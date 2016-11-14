@@ -6,19 +6,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.datatable.impl.KeywordDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DriverScript;
+import com.autopia4j.framework.webdriver.core.ExecutionMode;
 import com.autopia4j.framework.webdriver.core.ReusableLibrary;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
+import com.autopia4j.framework.webdriver.core.TestHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
-
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +32,8 @@ import java.lang.reflect.*;
  */
 public class KeywordDriverScript extends DriverScript {
 	private final Logger logger = LoggerFactory.getLogger(KeywordDriverScript.class);
-	private List<String> businessFlowData;
-	private int currentSubIteration;
 	
+	private int currentSubIteration;
 	
 	/**
 	 * DriverScript constructor
@@ -44,7 +44,29 @@ public class KeywordDriverScript extends DriverScript {
 	}
 	
 	@Override
-	protected int getNumberOfIterations() {
+	public void driveTestExecution() {
+		TestHarness testHarness = new TestHarness();
+		
+		testHarness.setDefaultTestParameters(testParameters);
+		String datatablePath = testHarness.getDatatablePath();
+		initializeTestIterations(datatablePath);
+		WebDriver driver = testHarness.initializeWebDriver(testParameters);
+		report = testHarness.initializeTestReport(testParameters, driver);
+		
+		KeywordDatatable dataTable = initializeDatatable(datatablePath);
+		ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
+		executeTestScript(dataTable, scriptHelper);
+		
+		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_DEVICE) {
+			testHarness.downloadPerfectoResults(driver, report);
+		}
+		testHarness.quitWebDriver(driver);
+		executionTime = testHarness.tearDown(scriptHelper);
+		testHarness.closeTestReport(scriptHelper, executionTime);
+	}
+	
+	@Override
+	protected int getNumberOfIterations(String datatablePath) {
 		ExcelDataAccess testDataAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
 		testDataAccess.setDatasheetName(properties.getProperty("datatable.default.sheet"));
@@ -55,14 +77,14 @@ public class KeywordDriverScript extends DriverScript {
 		return nTestcaseRows / nSubIterations;
 	}
 	
-	@Override
-	protected void initializeDatatable() {
+	private KeywordDatatable initializeDatatable(String datatablePath) {
 		logger.info("Initializing datatable");
 		String runTimeDatatablePath;
 		Boolean includeTestDataInReport =
 				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
 		if (includeTestDataInReport) {
-			runTimeDatatablePath = reportPath + Util.getFileSeparator() + "datatables";
+			runTimeDatatablePath = report.getReportSettings().getReportPath() +
+											Util.getFileSeparator() + "datatables";
 			
 			File runTimeDatatable = new File(runTimeDatatablePath + Util.getFileSeparator() +
 												testParameters.getCurrentModule() + ".xls");
@@ -106,18 +128,19 @@ public class KeywordDriverScript extends DriverScript {
 			runTimeDatatablePath = datatablePath;
 		}
 		
-		dataTable = new KeywordDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
+		KeywordDatatable dataTable =
+				new KeywordDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
-	}
-	
-	@Override
-	protected void initializeTestScript() {
-		scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		
-		initializeBusinessFlow();
+		return dataTable;
 	}
 	
-	private void initializeBusinessFlow() {
+	private void executeTestScript(KeywordDatatable datatable, ScriptHelper scriptHelper) {
+		List<String> businessFlowData = getBusinessFlowData(datatable.getDatatablePath());
+		executeTestIterations(businessFlowData, datatable, scriptHelper);
+	}
+	
+	private List<String> getBusinessFlowData(String datatablePath) {
 		logger.info("Initializing the business flow for the specified test script");
 		ExcelDataAccess businessFlowAccess =
 				new ExcelDataAccess(datatablePath, testParameters.getCurrentModule());
@@ -131,7 +154,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 		
 		String dataValue;
-		businessFlowData = new ArrayList<>();
+		List<String> businessFlowData = new ArrayList<>();
 		int currentColumnNum = 1;
 		while (true) {
 			dataValue = businessFlowAccess.getValue(rowNum, currentColumnNum);
@@ -147,34 +170,31 @@ public class KeywordDriverScript extends DriverScript {
 			logger.error(errorDescription);
 			throw new AutopiaException(errorDescription);
 		}
+		
+		return businessFlowData;
 	}
 	
-	@Override
-	protected void executeTestScript() {
-		executeTestIterations();
-	}
-	
-	private void executeTestIterations() {
+	private void executeTestIterations(List<String> businessFlowData, KeywordDatatable datatable, ScriptHelper scriptHelper) {
 		while(currentIteration <= testParameters.getEndIteration()) {
 			report.addTestLogSection("Iteration: " + Integer.toString(currentIteration));
 			
 			// Evaluate each test iteration for any errors
 			try {
 				logger.info("Executing the business flow for the specified test script");
-				executeBusinessFlow(businessFlowData);
+				processBusinessFlow(businessFlowData, datatable, scriptHelper);
 			} catch (AutopiaException fx) {
-				exceptionHandler(fx, fx.getErrorName());
-			} catch (InvocationTargetException ix) {
-				exceptionHandler(ix, "Error");
+				logger.error("Error during test execution", fx);
+				handleExceptionInCurrentIteration(fx, fx.getErrorName());
 			} catch (Exception ex) {
-				exceptionHandler(ex, "Error");
+				logger.error("Error during test execution", ex);
+				handleExceptionInCurrentIteration(ex, "Error");
 			}
 			
 			currentIteration++;
 		}
 	}
 	
-	private void executeBusinessFlow(List<String> businessFlowData)
+	private void processBusinessFlow(List<String> businessFlowData, KeywordDatatable dataTable, ScriptHelper scriptHelper)
 			throws IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException, InstantiationException {
 		Map<String, Integer> keywordDirectory = new HashMap<>();
@@ -206,12 +226,12 @@ public class KeywordDriverScript extends DriverScript {
 					report.addTestLogSubSection(currentKeyword);
 				}
 				
-				invokeBusinessComponent(currentKeyword);
+				invokeBusinessComponent(currentKeyword, scriptHelper);
 			}
 		}
 	}
 	
-	private void invokeBusinessComponent(String currentKeyword) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	private void invokeBusinessComponent(String currentKeyword, ScriptHelper scriptHelper) throws ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		Boolean isTestComponentFound = false;
 		String pagesPackage = frameworkParameters.getBasePackageName() + ".pages";
 		String flowsPackage = frameworkParameters.getBasePackageName() + ".flows";

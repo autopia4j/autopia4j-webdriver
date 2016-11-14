@@ -14,8 +14,8 @@ import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.webdriver.core.Browser;
 import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.core.ExecutionMode;
+import com.autopia4j.framework.webdriver.core.TestBatchHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
-import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
 
 
 /**
@@ -23,11 +23,9 @@ import com.autopia4j.framework.webdriver.reporting.ResultSummaryManager;
  * @author vj
  */
 public class Allocator {
-	private FrameworkParameters frameworkParameters =
-												FrameworkParameters.getInstance();
+	private FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
 	private Properties properties;
-	private ResultSummaryManager resultSummaryManager =
-												ResultSummaryManager.getInstance();
+	private TestBatchHarness testBatchHarness;
 	
 	
 	/**
@@ -37,42 +35,22 @@ public class Allocator {
 	 * @throws InterruptedException Exception thrown in case of issues waiting for the parallel executor to terminate
 	 */
 	public int driveBatchExecution() throws InterruptedException {
-		resultSummaryManager.setBasePath();
+		testBatchHarness = TestBatchHarness.getInstance();
+		testBatchHarness.initialize();
 		properties = Settings.getInstance();
 		
-		String runConfiguration = getRunConfiguration();
-		String executionEnvironment = getExecutionEnvironment();
-		resultSummaryManager.initializeTestBatch(runConfiguration,
-													executionEnvironment);
-		
 		int nThreads = Integer.parseInt(properties.getProperty("allocator.threads.count"));
-		resultSummaryManager.initializeSummaryReport(nThreads);
+		testBatchHarness.initializeSummaryReport(nThreads);
 		
 		int testBatchStatus = executeTestBatch(nThreads);
 		
-		resultSummaryManager.wrapUp(false);
+		testBatchHarness.wrapUp(false);
 		
 		if (System.getProperty("autopia.report.path") == null) {	// No Report path specified from outside
-			resultSummaryManager.launchResultSummary();
+			testBatchHarness.launchResultSummary();
 		}
 		
 		return testBatchStatus;
-	}
-	
-	private String getRunConfiguration() {
-		if (System.getProperty("autopia.run.configuration") != null) {
-			return System.getProperty("autopia.run.configuration");
-		} else {
-			return properties.getProperty("run.configuration");
-		}
-	}
-	
-	private String getExecutionEnvironment() {
-		if (System.getProperty("autopia.execution.environment") != null) {
-			return System.getProperty("autopia.execution.environment");
-		} else {
-			return properties.getProperty("execution.environment");
-		}
 	}
 	
 	private int executeTestBatch(int nThreads) throws InterruptedException {

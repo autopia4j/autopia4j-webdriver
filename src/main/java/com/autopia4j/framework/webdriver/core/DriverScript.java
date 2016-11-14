@@ -1,63 +1,28 @@
 package com.autopia4j.framework.webdriver.core;
 
-import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.core.IterationOptions;
 import com.autopia4j.framework.core.OnError;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.core.TimeStamp;
-import com.autopia4j.framework.datatable.DataTableType;
-import com.autopia4j.framework.reporting.ReportSettings;
-import com.autopia4j.framework.reporting.ReportTheme;
-import com.autopia4j.framework.reporting.ReportThemeFactory;
 import com.autopia4j.framework.reporting.Status;
-import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
-import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.mobile.AppiumWebDriverFactory;
-import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverFactory;
-import com.autopia4j.framework.webdriver.mobile.PerfectoWebDriverUtil;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
-import com.autopia4j.framework.webdriver.utils.GalenUtil;
-import com.autopia4j.framework.webdriver.utils.WebDriverFactory;
-import com.autopia4j.framework.webdriver.utils.WebDriverProxy;
 
 /**
- * Abstract class that implements the core logic of the autopia4j framework for WebDriver 
+ * Abstract class that defines the execution structure for data iteration based implementations of autopia4j 
  * @author vj
  */
 public abstract class DriverScript {
-	private final Logger logger = LoggerFactory.getLogger(DriverScript.class);
+	protected final WebDriverTestParameters testParameters;
+	protected WebDriverReport report;
+	
+	protected final FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
+	protected Properties properties = Settings.getInstance();
+	
 	protected int currentIteration;
 	
-	private Date startTime;
-	private Date endTime;
 	protected String executionTime;
-	
-	protected DataTableType dataTable;
-	protected ReportSettings reportSettings;
-	protected WebDriverReport report;
-	protected WebDriver driver;
-	protected ScriptHelper scriptHelper;
-	
-	protected Properties properties;
-	protected final FrameworkParameters frameworkParameters =
-										FrameworkParameters.getInstance();
-	
-	private Boolean linkScreenshotsToTestLog = true;
-	
-	protected final WebDriverTestParameters testParameters;
-	protected String datatablePath;
-	protected String reportPath;
-	
 	
 	/**
 	 * DriverScript constructor
@@ -76,19 +41,11 @@ public abstract class DriverScript {
 	}
 	
 	/**
-	 * Function to configure the linking of screenshots to the corresponding test log
-	 * @param linkScreenshotsToTestLog Boolean variable indicating whether screenshots should be linked to the corresponding test log
-	 */
-	public void setLinkScreenshotsToTestLog(Boolean linkScreenshotsToTestLog) {
-		this.linkScreenshotsToTestLog = linkScreenshotsToTestLog;
-	}
-	
-	/**
 	 * Function to get the name of the test report
 	 * @return The test report name
 	 */
 	public String getReportName() {
-		return reportSettings.getReportName();
+		return report.getReportSettings().getReportName();
 	}
 	
 	/**
@@ -116,84 +73,13 @@ public abstract class DriverScript {
 	}
 	
 	/**
-	 * Function to execute the given test case
+	 * Function to initialize the iteration settings for the given test case
+	 * @param datatablePath The path where the datatable is stored
 	 */
-	public void driveTestExecution() {
-		startUp();
-		initializeTestIterations();
-		initializeWebDriver();
-		initializeTestReport();
-		initializeDatatable();
-		initializeTestScript();
-		
-		executeTestScript();
-		
-		quitWebDriver();
-		wrapUp();
-	}
-	
-	private void startUp() {
-		startTime = Util.getCurrentTime();
-		logger.info("Starting test execution");
-		
-		properties = Settings.getInstance();
-		
-		datatablePath = frameworkParameters.getBasePath() +
-							Util.getFileSeparator() + "src" +
-							Util.getFileSeparator() + "test" +
-							Util.getFileSeparator() + "resources" +
-							Util.getFileSeparator() + "datatables";
-		
-		setDefaultTestParameters();
-	}
-	
-	private void setDefaultTestParameters() {
-		if (testParameters.getIterationMode() == null) {
-			logger.info("Iteration mode unspecified. Setting to default value: All Iterations");
-			testParameters.setIterationMode(IterationOptions.RUN_ALL_ITERATIONS);
-		}
-		
-		if (testParameters.getExecutionMode() == null) {
-			String defaultExecutionMode = properties.getProperty("execution.mode.default");
-			logger.info("Execution mode unspecified. Setting to default value: {}", defaultExecutionMode);
-			testParameters.setExecutionMode(ExecutionMode.valueOf(defaultExecutionMode));
-		}
-		
-		if (testParameters.getDeviceName() == null) {
-			String defaultDeviceName = properties.getProperty("device.name.default");
-			logger.info("Device name unspecified. Setting to default value: {}", defaultDeviceName);
-			testParameters.setDeviceName(defaultDeviceName);
-		}
-		
-		if (testParameters.getBrowser() == null) {
-			String defaultBrowser = properties.getProperty("browser.default");
-			logger.info("Browser unspecified. Setting to default value: {}", defaultBrowser);
-			testParameters.setBrowser(Browser.valueOf(defaultBrowser));
-		}
-		
-		if (testParameters.getPlatform() == null) {
-			String defaultPlatform = properties.getProperty("platform.default");
-			logger.info("Platform unspecified. Setting to default value: {}", defaultPlatform);
-			testParameters.setPlatform(Platform.valueOf(defaultPlatform));
-		}
-		
-		if (testParameters.getDeviceType() == null) {
-			String defaultDeviceType = properties.getProperty("device.type.default");
-			logger.info("Device Type unspecified. Setting to default value: {}", defaultDeviceType);
-			testParameters.setDeviceType(DeviceType.valueOf(defaultDeviceType));
-		}
-		
-		if(testParameters.getRemoteUrl() == null) {
-			String defaultRemoteUrl = properties.getProperty("remote.url.default");
-			logger.info("Remote URL unspecified. Setting to default value: {}", defaultRemoteUrl);
-			testParameters.setRemoteUrl(defaultRemoteUrl);
-		}
-	}
-	
-	private void initializeTestIterations() {
+	protected void initializeTestIterations(String datatablePath) {
 		switch(testParameters.getIterationMode()) {
 		case RUN_ALL_ITERATIONS:
-			int nIterations = getNumberOfIterations();
+			int nIterations = getNumberOfIterations(datatablePath);
 			testParameters.setEndIteration(nIterations);
 			
 			currentIteration = 1;
@@ -215,217 +101,24 @@ public abstract class DriverScript {
 		}
 	}
 	
-	protected abstract int getNumberOfIterations();
+	/**
+	 * Function to calculate the number of iterations configured for the given test case
+	 * @param datatablePath The path where the datatable is stored
+	 * @return The number of iterations configured for the given test case
+	 */
+	protected abstract int getNumberOfIterations(String datatablePath);
 	
-	private void initializeWebDriver() {
-		logger.info("Initializing WebDriver");
-		
-		switch(testParameters.getExecutionMode()) {
-		case LOCAL:
-			initializeWebDriverFactory();
-			driver = WebDriverFactory.getWebDriver(testParameters.getBrowser());
-			break;
-			
-		case REMOTE:
-			initializeWebDriverFactory();
-			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
-															testParameters.getRemoteUrl());
-			break;
-			
-		case LOCAL_EMULATED_DEVICE:
-			initializeWebDriverFactory();
-			testParameters.setBrowser(Browser.CHROME);	// Mobile emulation supported only on Chrome
-			driver = WebDriverFactory.getEmulatedWebDriver(testParameters.getDeviceName());
-			break;
-			
-		case REMOTE_EMULATED_DEVICE:
-			initializeWebDriverFactory();
-			testParameters.setBrowser(Browser.CHROME);	// Mobile emulation supported only on Chrome
-			driver = WebDriverFactory.getEmulatedRemoteWebDriver(testParameters.getDeviceName(), 
-																	testParameters.getRemoteUrl());
-			break;
-			
-		case GRID:
-			initializeWebDriverFactory();
-			driver = WebDriverFactory.getRemoteWebDriver(testParameters.getBrowser(),
-													testParameters.getBrowserVersion(),
-													testParameters.getPlatform(),
-													testParameters.getRemoteUrl());
-			break;
-			
-		case PERFECTO_DEVICE:
-			initializePerfectoWebDriverFactory();
-			driver = PerfectoWebDriverFactory.getPerfectoRemoteWebDriver(testParameters.getPerfectoDeviceId(),
-																testParameters.getDeviceType(),
-																testParameters.getBrowser(),
-																testParameters.getRemoteUrl());
-			break;
-			
-		case APPIUM_DEVICE:
-			driver = AppiumWebDriverFactory.getAppiumWebDriver(testParameters.getDeviceName(),
-														testParameters.getScreenOrientation(),
-														testParameters.getBrowser(),
-														testParameters.getPlatform(),
-														testParameters.getRemoteUrl());
-			break;
-			
-		default:
-			throw new AutopiaException("Unhandled Execution Mode!");
-		}
-		
-		long objectSyncTimeout =
-				Long.parseLong(properties.get("timeout.object.sync").toString());
-		long pageLoadTimeout =
-				Long.parseLong(properties.get("timeout.page.load").toString());
-		driver.manage().timeouts().implicitlyWait(objectSyncTimeout, TimeUnit.SECONDS);
-		driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
-		
-		if(testParameters.getDeviceType().getValue().contains("desktop")) {
-			driver.manage().window().maximize();
-		}
-	}
+	/**
+	 * Function to execute all iterations of the given test case
+	 */
+	public abstract void driveTestExecution();
 	
-	private void initializeWebDriverFactory() {
-		logger.info("Initializing WebDriverFactory");
-		
-		WebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("ssl.certs.accept.all")));
-		WebDriverFactory.setIntroduceFlakinessInternetExplorer(Boolean.parseBoolean(properties.getProperty("internet.explorer.introduce.flakiness")));
-		WebDriverFactory.setTurnOffPopupBlockerInternetExplorer(Boolean.parseBoolean(properties.getProperty("internet.explorer.popupblocker.turnoff")));
-		
-		Boolean proxyRequired = Boolean.parseBoolean(properties.getProperty("proxy.required"));
-		WebDriverFactory.setProxyRequired(proxyRequired);
-		
-		if (proxyRequired) {
-			WebDriverProxy proxy = new WebDriverProxy();
-			proxy.setHost(properties.getProperty("proxy.host"));
-			proxy.setPort(Integer.parseInt(properties.getProperty("proxy.port")));
-			
-			Boolean authRequired = Boolean.parseBoolean(properties.getProperty("proxy.auth.required"));
-			proxy.setAuthRequired(authRequired);
-			if(authRequired) {
-				proxy.setDomain(properties.getProperty("proxy.auth.domain"));
-				proxy.setUserName(properties.getProperty("proxy.auth.username"));
-				proxy.setPassword(properties.getProperty("proxy.auth.password"));
-			}
-			WebDriverFactory.setProxy(proxy);
-		}
-	}
-	
-	private void initializePerfectoWebDriverFactory() {
-		logger.info("Initializing PerfectoWebDriverFactory");
-		
-		PerfectoWebDriverFactory.setAcceptAllSslCertificates(Boolean.parseBoolean(properties.getProperty("ssl.certs.accept.all")));
-		PerfectoWebDriverFactory.setUserName(properties.getProperty("perfecto.username"));
-		PerfectoWebDriverFactory.setPassword(properties.getProperty("perfecto.password"));
-	}
-	
-	private void initializeTestReport() {
-		logger.info("Initializing test log");
-		initializeReportSettings();
-		ReportTheme reportTheme =
-				ReportThemeFactory.getReportsTheme(Theme.valueOf(properties.getProperty("report.theme")));
-		
-		report = new WebDriverReport(reportSettings, reportTheme);
-		
-		report.initialize();
-		report.setDriver(driver);
-		report.initializeTestLog();
-		createTestLogHeader();
-	}
-	
-	private void initializeReportSettings() {
-		if(System.getProperty("autopia.report.path") != null) {
-			reportPath = System.getProperty("autopia.report.path");
-		} else {
-			reportPath = TimeStamp.getInstance();
-		}
-		String reportName = testParameters.getCurrentModule() +
-							"_" + testParameters.getCurrentTestcase() +
-							"_" + testParameters.getCurrentTestInstance();
-		
-		reportSettings = new ReportSettings(reportPath, reportName);
-		reportSettings.setDateFormatString(properties.getProperty("date.format.string"));
-		reportSettings.setLogLevel(Integer.parseInt(properties.getProperty("report.level")));
-		reportSettings.setProjectName(properties.getProperty("project.name"));
-		reportSettings.setGenerateExcelReports(Boolean.parseBoolean(properties.getProperty("report.excel.enable")));
-		reportSettings.setGenerateHtmlReports(Boolean.parseBoolean(properties.getProperty("report.html.enable")));
-		reportSettings.setConsolidateScreenshotsInWordDoc(
-				Boolean.parseBoolean(properties.getProperty("report.screenshots.consolidate.worddoc")));
-		if (testParameters.getBrowser().equals(Browser.HTML_UNIT)) {
-			// Screenshots not supported in headless mode
-			reportSettings.setLinkScreenshotsToTestLog(false);
-		} else {
-			reportSettings.setLinkScreenshotsToTestLog(this.linkScreenshotsToTestLog);
-		}
-	}
-	
-	private void createTestLogHeader() {
-		report.addTestLogHeading(reportSettings.getProjectName() +
-									" - " + reportSettings.getReportName() +
-									" Automation Execution Results");
-		report.addTestLogSubHeading("Date & Time",
-										": " + Util.getFormattedTime(startTime, properties.getProperty("date.format.string")),
-										"Iteration Mode", ": " + testParameters.getIterationMode());
-		report.addTestLogSubHeading("Start Iteration", ": " + testParameters.getStartIteration(),
-									"End Iteration", ": " + testParameters.getEndIteration());
-		
-		switch(testParameters.getExecutionMode()) {
-		case LOCAL:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Local Machine");
-			break;
-			
-		case REMOTE:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Remote Machine @ " + testParameters.getRemoteUrl());
-			break;
-			
-		case LOCAL_EMULATED_DEVICE:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Emulated Mobile Device on Local Machine");
-			report.addTestLogSubHeading("Emulated Device Name", ": " + testParameters.getDeviceName(), "", "");
-			break;
-			
-		case REMOTE_EMULATED_DEVICE:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Emulated Mobile Device on Remote Machine @ " + testParameters.getRemoteUrl());
-			report.addTestLogSubHeading("Emulated Device Name", ": " + testParameters.getDeviceName(), "", "");
-			break;
-			
-		case GRID:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Grid @ " + testParameters.getRemoteUrl());
-			break;
-			
-		case PERFECTO_DEVICE:
-            report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-            		"Executed on", ": " + "Perfecto MobileCloud @ " + testParameters.getRemoteUrl()); 
-            report.addTestLogSubHeading("Device Name/ID", ": " + testParameters.getDeviceName() +
-            		" (" + testParameters.getPerfectoDeviceId() + ")",
-            		"Perfecto User", ": " + properties.getProperty("perfecto.username")); 
-            break;
-            
-		case APPIUM_DEVICE:
-			report.addTestLogSubHeading("Browser/Platform", ": " + testParameters.getBrowserAndPlatform(),
-					"Executed on", ": " + "Mobile Device on Appium Server @ " + testParameters.getRemoteUrl());
-			report.addTestLogSubHeading("Device Type", ": " + testParameters.getDeviceType(),
-					"Device Name", ": " + testParameters.getDeviceName());
-            break;
-            
-		default:
-			throw new AutopiaException("Unhandled Execution Mode!");
-		}
-		
-		report.addTestLogTableHeadings();
-	}
-	
-	protected abstract void initializeDatatable();
-	
-	protected abstract void initializeTestScript();
-	
-	protected abstract void executeTestScript();
-	
-	protected void exceptionHandler(Exception ex, String exceptionName) {
+	/**
+	 * Function to handle any exception that occurs during a specific iteration of the given test case
+	 * @param ex The {@link Exception} thrown
+	 * @param exceptionName The name of the Exception to be reported
+	 */
+	protected void handleExceptionInCurrentIteration(Exception ex, String exceptionName) {
 		// Error reporting
 		String exceptionDescription = ex.getMessage();
 		if(exceptionDescription == null) {
@@ -438,9 +131,6 @@ public abstract class DriverScript {
 		} else {
 			report.updateTestLog(exceptionName, exceptionDescription, Status.FAIL, true);
 		}
-		
-		// Error logging
-		logger.error("Error during test execution", ex);
 		
 		// Error response
 		report.addTestLogSubSection("ErrorResponse");
@@ -478,41 +168,5 @@ public abstract class DriverScript {
 				throw new AutopiaException("Unhandled OnError option!");
 			}
 		}
-	}
-	
-	private void quitWebDriver() {
-		logger.info("Quitting WebDriver");
-		report.addTestLogSubSection("CloseBrowser");
-		
-		if (testParameters.getExecutionMode() == ExecutionMode.PERFECTO_DEVICE) {
-			PerfectoWebDriverUtil perfectoWebDriverUtil = new PerfectoWebDriverUtil(driver, report);
-			perfectoWebDriverUtil.downloadPerfectoResults();
-		}
-		
-		try {
-			driver.quit();
-			report.updateTestLog("Close browser", "Browser closed successfully", Status.DONE);
-		} catch(Exception ex) {
-			logger.error("Exception while closing the browser", ex);
-			report.updateTestLog("Close browser", ex.getMessage(), Status.WARNING);
-		}
-	}
-	
-	private void wrapUp() {
-		endTime = Util.getCurrentTime();
-		closeTestReport();
-		logger.info("Test execution complete");
-	}
-	
-	private void closeTestReport() {
-		GalenUtil galenUtil = scriptHelper.getGalenUtil();
-		galenUtil.exportGalenReports();
-		
-		if (reportSettings.shouldConsolidateScreenshotsInWordDoc()) {
-			report.consolidateScreenshotsInWordDoc();
-		}
-		
-		executionTime = Util.getTimeDifference(startTime, endTime);
-		report.addTestLogFooter(executionTime);
 	}
 }
