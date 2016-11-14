@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
+import com.autopia4j.framework.webdriver.core.TestBatchHarness;
 import com.autopia4j.framework.webdriver.core.TestHarness;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
 
@@ -17,9 +18,20 @@ public class CukeHooks extends MasterStepDefs {
 	Logger logger = LoggerFactory.getLogger(CukeHooks.class);
 	private TestHarness testHarness;
 	
+	private static Boolean runningFirstScenario = true;
+	
 	@Before
 	public void setUp(Scenario scenario) {
 		currentScenario = scenario;
+		
+		if(runningFirstScenario) {
+			logger.info("Running global @Before hook...");
+			TestBatchHarness testBatchHarness = TestBatchHarness.getInstance();
+			testBatchHarness.initialize();
+			runningFirstScenario = false;
+		}
+		
+		logger.info("Running scenario @Before hook...");
 		
 		testHarness = new TestHarness();
 		FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
@@ -33,6 +45,8 @@ public class CukeHooks extends MasterStepDefs {
 	
 	@After
 	public void tearDown() {
+		logger.info("Running scenario @After hook...");
+		
 		testHarness.quitWebDriver(driver);
 	}
 }

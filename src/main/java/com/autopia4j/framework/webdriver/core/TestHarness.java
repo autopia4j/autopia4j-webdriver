@@ -12,13 +12,11 @@ import org.slf4j.LoggerFactory;
 import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.IterationOptions;
-import com.autopia4j.framework.core.OnError;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.core.TimeStamp;
 import com.autopia4j.framework.reporting.ReportSettings;
 import com.autopia4j.framework.reporting.ReportTheme;
 import com.autopia4j.framework.reporting.ReportThemeFactory;
-import com.autopia4j.framework.reporting.Status;
 import com.autopia4j.framework.reporting.ReportThemeFactory.Theme;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.mobile.AppiumWebDriverFactory;
@@ -40,7 +38,7 @@ public class TestHarness {
 	
 	
 	/**
-	 * Constructor
+	 * Constructor to initialize the {@link TestHarness} object
 	 */
 	public TestHarness() {
 		startTime = Util.getCurrentTime();
@@ -49,9 +47,10 @@ public class TestHarness {
 	}
 	
 	/**
-	 * 
-	 * @param testParameters
-	 * @return
+	 * Function to initialize the {@link WebDriverTestParameters} object
+	 * @param currentModule The name of the current module
+	 * @param currentTestcase The name of the current test case
+	 * @return The {@link WebDriverTestParameters} object, initialized to default values
 	 */
 	public WebDriverTestParameters initializeTestParameters(String currentModule, String currentTestcase) {
 		WebDriverTestParameters testParameters = new WebDriverTestParameters(currentModule, currentTestcase);
@@ -82,8 +81,8 @@ public class TestHarness {
 	}
 	
 	/**
-	 * 
-	 * @param testParameters
+	 * Function to set default values for the given {@link WebDriverTestParameters} object
+	 * @param testParameters The {@link WebDriverTestParameters} object
 	 */
 	public void setDefaultTestParameters(WebDriverTestParameters testParameters) {
 		if (testParameters.getIterationMode() == null) {
@@ -128,6 +127,10 @@ public class TestHarness {
 		}
 	}
 	
+	/**
+	 * Function to return the absolute path where the datatables are stored
+	 * @return The absolute path where the datatables are stored
+	 */
 	public String getDatatablePath() {
 		return frameworkParameters.getBasePath() +
 				Util.getFileSeparator() + "src" +
@@ -136,6 +139,11 @@ public class TestHarness {
 				Util.getFileSeparator() + "datatables";
 	}
 	
+	/**
+	 * Function to initialize the {@link WebDriver} object based on the {@link WebDriverTestParameters} passed in
+	 * @param testParameters The {@link WebDriverTestParameters} object
+	 * @return The {@link WebDriver} object
+	 */
 	public WebDriver initializeWebDriver(WebDriverTestParameters testParameters) {
 		logger.info("Initializing WebDriver");
 		
@@ -245,11 +253,10 @@ public class TestHarness {
 	}
 	
 	/**
-	 * 
-	 * @param testParameters
-	 * @param driver
-	 * @param startTime
-	 * @return
+	 * Function to initialize the {@link WebDriverReport} object
+	 * @param testParameters The {@link WebDriverTestParameters} object
+	 * @param driver The {@link WebDriver} object
+	 * @return The {@link WebDriverReport} object
 	 */
 	public WebDriverReport initializeTestReport(WebDriverTestParameters testParameters, WebDriver driver) {
 		logger.info("Initializing test log");
@@ -358,63 +365,20 @@ public class TestHarness {
 		report.addTestLogTableHeadings();
 	}
 	
-	protected void exceptionHandler(Exception ex, WebDriverReport report) {
-		// Error reporting
-		String exceptionDescription = ex.getMessage();
-		if(exceptionDescription == null) {
-			exceptionDescription = ex.toString();
-		}
-		
-		if(ex.getCause() != null) {
-			report.updateTestLog("Error", exceptionDescription + " <b>Caused by: </b>" +
-																ex.getCause(), Status.FAIL, true);
-		} else {
-			report.updateTestLog("Error", exceptionDescription, Status.FAIL, true);
-		}
-		
-		// Error logging
-		logger.error("Error during test execution", ex);
-		
-		// Error response
-		report.addTestLogSubSection("ErrorResponse");
-		if (frameworkParameters.getStopExecution()) {
-			report.updateTestLog("Framework Info",
-					"Test execution terminated by user! All subsequent tests aborted...",
-					Status.DONE);
-		} else {
-			OnError onError = OnError.valueOf(properties.getProperty("on.error"));
-			switch(onError) {
-			// Stop option is not relevant when run from HP ALM
-			case NEXT_ITERATION:
-				report.updateTestLog("Framework Info",
-						"Test case iteration terminated by user! Proceeding to next iteration (if applicable)...",
-						Status.DONE);
-				break;
-				
-			case NEXT_TESTCASE:
-				report.updateTestLog("Framework Info",
-						"Test case terminated by user! Proceeding to next test case (if applicable)...",
-						Status.DONE);
-				break;
-				
-			case STOP:
-				frameworkParameters.setStopExecution(true);
-				report.updateTestLog("Framework Info",
-						"Test execution terminated by user! All subsequent tests aborted...",
-						Status.DONE);
-				break;
-				
-			default:
-				throw new AutopiaException("Unhandled OnError option!");
-			}
-		}
-	}
-	
+	/**
+	 * Function to download the PerfectoMobile run results
+	 * @param driver The {@link WebDriver} object
+	 * @param report The {@link WebDriverReport} object
+	 */
 	public void downloadPerfectoResults(WebDriver driver, WebDriverReport report) {
 		PerfectoWebDriverUtil perfectoWebDriverUtil = new PerfectoWebDriverUtil(driver, report);
 		perfectoWebDriverUtil.downloadPerfectoResults();
 	}
 	
+	/**
+	 * Function to tear-down the {@link WebDriver} object
+	 * @param driver The {@link WebDriver} object
+	 */
 	public void quitWebDriver(WebDriver driver) {
 		logger.info("Quitting WebDriver");
 		
@@ -425,6 +389,11 @@ public class TestHarness {
 		}
 	}
 	
+	/**
+	 * Function to tear-down the {@link TestHarness} object
+	 * @param scriptHelper The {@link ScriptHelper} object
+	 * @return The script execution time
+	 */
 	public String tearDown(ScriptHelper scriptHelper) {
 		logger.info("Test execution complete");
 		
@@ -432,6 +401,11 @@ public class TestHarness {
 		return Util.getTimeDifference(startTime, endTime);
 	}
 	
+	/**
+	 * Function to close the test report
+	 * @param scriptHelper The {@link ScriptHelper} object
+	 * @param executionTime The script execution time
+	 */
 	public void closeTestReport(ScriptHelper scriptHelper, String executionTime) {
 		GalenUtil galenUtil = scriptHelper.getGalenUtil();
 		galenUtil.exportGalenReports();
