@@ -1,39 +1,28 @@
 package com.autopia4j.framework.webdriver.impl.modular;
 
-import java.util.Properties;
-
-import org.openqa.selenium.WebDriver;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
+
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.datatable.impl.ModularDatatable;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
-import com.autopia4j.framework.webdriver.core.TestBatchHarness;
+import com.autopia4j.framework.webdriver.core.TestScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
-import com.autopia4j.framework.webdriver.utils.GalenUtil;
-import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
 
 
 /**
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class ModularTestScript {
-	
+public abstract class ModularTestScript extends TestScript {
 	/**
-	 * The {@link DeviceType} object (passed from the Driver script)
+	 * The {@link ScriptHelper} object (required for calling one reusable library from another)
 	 */
-	protected DeviceType deviceType;
-	
+	protected ScriptHelper scriptHelper;
 	/**
 	 * The {@link ModularDatatable} object (passed from the Driver script)
 	 */
@@ -42,53 +31,16 @@ public abstract class ModularTestScript {
 	 * The {@link WebDriverReport} object (passed from the Driver script)
 	 */
 	protected WebDriverReport report;
-	/**
-	 * The {@link WebDriver} object (passed from the Driver script)
-	 */
-	protected WebDriver driver;
-	/**
-	 * The {@link WebDriverUtil} object (passed from the Driver script)
-	 */
-	protected WebDriverUtil driverUtil;
-	/**
-	 * The {@link GalenUtil} object (passed from the Driver script)
-	 */
-	protected GalenUtil galenUtil;
 	
 	/**
-	 * The {@link ScriptHelper} object (required for calling one reusable library from another)
-	 */
-	protected ScriptHelper scriptHelper;
-	
-	/**
-	 * The {@link FrameworkParameters} object
-	 */
-	protected FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
-	
-	/**
-	 * The {@link Properties} object with settings loaded from the framework properties file
-	 */
-	protected Properties properties;
-	
-	/**
-	 * Object synchronization timeout
-	 */
-	protected long objectSyncTimeout;
-	/**
-	 * Page load timeout
-	 */
-	protected long pageLoadTimeout;
-	
-	/**
-	 * The current module (auto initialized during the test runner setup)
+	 * The name of the current module
 	 */
 	protected String currentModule;
 	/**
-	 * The current test script (auto initialized during the test runner setup)
+	 * The name of the current test script
 	 */
 	protected String currentTest;
 	
-	private TestBatchHarness testBatchHarness;
 	private ThreadLocal<ModularDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
@@ -100,42 +52,8 @@ public abstract class ModularTestScript {
 	public void initialize(ScriptHelper scriptHelper) {
 		this.scriptHelper = scriptHelper;
 		
-		deviceType = scriptHelper.getDeviceType();
-		dataTable = (ModularDatatable) scriptHelper.getDataTable();
-		report = scriptHelper.getReport();
-		driver = scriptHelper.getDriver();
-		driverUtil = scriptHelper.getDriverUtil();
-		galenUtil = scriptHelper.getGalenUtil();
-		objectSyncTimeout = frameworkParameters.getObjectSyncTimeout();
-		pageLoadTimeout = frameworkParameters.getPageLoadTimeout();
-	}
-	
-	/**
-	 * Function to do the required framework setup activities before executing the overall test suite
-	 * @param testContext The TestNG {@link ITestContext} of the current test suite 
-	 */
-	@BeforeSuite
-	public void setUpTestSuite(ITestContext testContext) {
-		testBatchHarness = TestBatchHarness.getInstance();
-		
-		if (System.getProperty("autopia.run.configuration") == null) {
-			System.setProperty("autopia.run.configuration", testContext.getSuite().getName());
-		}
-		testBatchHarness.initialize();
-		properties = Settings.getInstance();
-		
-		int nThreads;
-		if ("false".equalsIgnoreCase(testContext.getSuite().getParallel())) {
-			nThreads = 1;
-		} else {
-			nThreads = testContext.getCurrentXmlTest().getThreadCount();
-		}
-		
-		// Note: Separate threads may be spawned through usage of DataProvider
-		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
-		// This level of threading will not be reflected in the summary report
-		
-		testBatchHarness.initializeSummaryReport(nThreads);
+		this.dataTable = (ModularDatatable) scriptHelper.getDataTable();
+		this.report = scriptHelper.getReport();
 	}
 	
 	/**
@@ -143,11 +61,12 @@ public abstract class ModularTestScript {
 	 */
 	@BeforeMethod
 	public void setUpTestRunner() {
+		FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
 		if(frameworkParameters.getStopExecution()) {
 			tearDownTestSuite();
 			
 			// Throwing TestNG SkipException within a configuration method causes all subsequent test methods to be skipped/aborted
-			throw new SkipException("Aborting all subsequent tests!");
+			throw new SkipException("Test execution terminated by user! All subsequent tests aborted...");
 		} else {
 			String[] currentPackageSplit = this.getClass().getPackage().getName().split(".testscripts.");
 			
@@ -192,20 +111,11 @@ public abstract class ModularTestScript {
 	public synchronized void tearDownTestRunner() {
 		ModularDriverScript driverScript = currentDriverScript.get();
 		WebDriverTestParameters testParameters = driverScript.getTestParameters();
-		
 		String testReportName = driverScript.getReportName();
 		String executionTime = driverScript.getExecutionTime();
 		String testStatus = driverScript.getTestStatus();
 		
 		testBatchHarness.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
-	}
-	
-	/**
-	 * Function to do the required framework tear-down activities after executing the overall test suite
-	 */
-	@AfterSuite(alwaysRun=true)
-	public void tearDownTestSuite() {
-		testBatchHarness.wrapUp(true);
 	}
 }

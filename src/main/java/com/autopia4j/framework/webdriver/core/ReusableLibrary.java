@@ -6,7 +6,6 @@ import org.openqa.selenium.WebDriver;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
 import com.autopia4j.framework.datatable.DataTableType;
-import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
@@ -18,53 +17,43 @@ import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
  */
 public abstract class ReusableLibrary {
 	/**
-	 * The {@link DeviceType} object (passed from the test script)
+	 * The {@link ScriptHelper} object (required for calling one reusable library from another)
 	 */
-	protected DeviceType deviceType;
+	protected final ScriptHelper scriptHelper;
 	
+	/**
+	 * The {@link WebDriverTestParameters} object (passed from the test script)
+	 */
+	protected final WebDriverTestParameters testParameters;
 	/**
 	 * The {@link DataTableType} object (passed from the test script)
 	 */
-	protected DataTableType dataTable;
+	protected final DataTableType dataTable;
 	/**
 	 * The {@link WebDriverReport} object (passed from the test script)
 	 */
-	protected WebDriverReport report;
+	protected final WebDriverReport report;
 	/**
 	 * The {@link WebDriver} object (passed from the test script)
 	 */
-	protected WebDriver driver;
+	protected final WebDriver driver;
 	/**
 	 * The {@link WebDriverUtil} object (passed from the test script)
 	 */
-	protected WebDriverUtil driverUtil;
+	protected final WebDriverUtil driverUtil;
 	/**
 	 * The {@link GalenUtil} object (passed from the test script)
 	 */
-	protected GalenUtil galenUtil;
+	protected final GalenUtil galenUtil;
 	
-	/**
-	 * The {@link ScriptHelper} object (required for calling one reusable library from another)
-	 */
-	protected ScriptHelper scriptHelper;
-	
-	/**
-	 * The {@link Properties} object with settings loaded from the framework properties file
-	 */
-	protected Properties properties;
 	/**
 	 * The {@link FrameworkParameters} object
 	 */
-	protected FrameworkParameters frameworkParameters;
-	
+	protected final FrameworkParameters frameworkParameters;
 	/**
-	 * Object synchronization timeout
+	 * The {@link Properties} object with settings loaded from the framework properties file
 	 */
-	protected long objectSyncTimeout;
-	/**
-	 * Page load timeout
-	 */
-	protected long pageLoadTimeout;
+	protected final Properties properties;
 	
 	
 	/**
@@ -74,7 +63,7 @@ public abstract class ReusableLibrary {
 	public ReusableLibrary(ScriptHelper scriptHelper) {
 		this.scriptHelper = scriptHelper;
 		
-		deviceType = scriptHelper.getDeviceType();
+		testParameters = scriptHelper.getTestParameters();
 		dataTable = scriptHelper.getDataTable();
 		report = scriptHelper.getReport();
 		driver = scriptHelper.getDriver();
@@ -83,7 +72,5 @@ public abstract class ReusableLibrary {
 		
 		properties = Settings.getInstance();
 		frameworkParameters = FrameworkParameters.getInstance();
-		objectSyncTimeout = frameworkParameters.getObjectSyncTimeout();
-		pageLoadTimeout = frameworkParameters.getPageLoadTimeout();
 	}
 }

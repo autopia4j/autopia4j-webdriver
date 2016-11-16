@@ -2,62 +2,31 @@ package com.autopia4j.framework.webdriver.impl.keyword;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.utils.Util;
-import com.autopia4j.framework.webdriver.core.TestBatchHarness;
+import com.autopia4j.framework.webdriver.core.TestScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
 
 
 /**
  * Abstract base class for all the test cases to be automated
  * @author vj
  */
-public abstract class KeywordTestScript {
+public abstract class KeywordTestScript extends TestScript {
 	/**
-	 * The current module (auto initialized during the test runner setup)
+	 * The name of the current module
 	 */
 	protected String currentModule;
 	/**
-	 * The current test script (auto initialized during the test runner setup)
+	 * The name of the current test script
 	 */
 	protected String currentTest;
 	
-	private TestBatchHarness testBatchHarness;
 	private ThreadLocal<KeywordDriverScript> currentDriverScript = new ThreadLocal<>();
 	
-	
-	/**
-	 * Function to do the required framework setup activities before executing the overall test suite
-	 * @param testContext The TestNG {@link ITestContext} of the current test suite 
-	 */
-	@BeforeSuite
-	public void setUpTestSuite(ITestContext testContext) {
-		testBatchHarness = TestBatchHarness.getInstance();
-		
-		if (System.getProperty("autopia.run.configuration") == null) {
-			System.setProperty("autopia.run.configuration", testContext.getSuite().getName());
-		}
-		testBatchHarness.initialize();
-		
-		int nThreads;
-		if ("false".equalsIgnoreCase(testContext.getSuite().getParallel())) {
-			nThreads = 1;
-		} else {
-			nThreads = testContext.getCurrentXmlTest().getThreadCount();
-		}
-		
-		// Note: Separate threads may be spawned through usage of DataProvider
-		// testContext.getSuite().getXmlSuite().getDataProviderThreadCount() will be at test case level (multiple instances on same test case in parallel)
-		// This level of threading will not be reflected in the summary report
-		
-		testBatchHarness.initializeSummaryReport(nThreads);
-	}
 	
 	/**
 	 * Function to do the required framework setup activities before executing each test case
@@ -91,10 +60,10 @@ public abstract class KeywordTestScript {
 	}
 	
 	/**
-	 * Function to do the required framework teardown activities after executing each test case
+	 * Function to do the required framework tear-down activities after executing each test case
 	 */
 	@AfterMethod(alwaysRun=true)
-	protected synchronized void tearDownTestRunner() {
+	public synchronized void tearDownTestRunner() {
 		KeywordDriverScript driverScript = currentDriverScript.get();
 		WebDriverTestParameters testParameters = driverScript.getTestParameters();
 		String testReportName = driverScript.getReportName();
@@ -103,13 +72,5 @@ public abstract class KeywordTestScript {
 		
 		testBatchHarness.updateResultSummary(testParameters, testReportName,
 														executionTime, testStatus);
-	}
-	
-	/**
-	 * Function to do the required framework tear-down activities after executing the overall test suite
-	 */
-	@AfterSuite(alwaysRun=true)
-	public void tearDownTestSuite() {
-		testBatchHarness.wrapUp(true);
 	}
 }

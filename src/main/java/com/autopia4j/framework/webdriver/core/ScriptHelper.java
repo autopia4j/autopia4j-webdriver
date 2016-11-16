@@ -4,7 +4,6 @@ import org.openqa.selenium.WebDriver;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.datatable.DataTableType;
-import com.autopia4j.framework.webdriver.core.DeviceType;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
@@ -15,7 +14,7 @@ import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
  * @author vj
  */
 public class ScriptHelper {
-	private final DeviceType deviceType;
+	private final WebDriverTestParameters testParameters;
 	private final DataTableType dataTable;
 	private final WebDriverReport report;
 	private final WebDriver driver;
@@ -32,7 +31,7 @@ public class ScriptHelper {
 	 */
 	public ScriptHelper(WebDriverTestParameters testParameters, DataTableType dataTable,
 						WebDriverReport report, WebDriver driver) {
-		this.deviceType = testParameters.getDeviceType();
+		this.testParameters = testParameters;
 		this.dataTable = dataTable;
 		this.report = report;
 		this.driver = driver;
@@ -46,11 +45,11 @@ public class ScriptHelper {
 	}
 	
 	/**
-	 * Function to get the {@link DeviceType} on which the test is being executed
-	 * @return The {@link DeviceType} on which the test is being executed
+	 * Function to get the {@link WebDriverTestParameters} object
+	 * @return The {@link WebDriverTestParameters} object
 	 */
-	public DeviceType getDeviceType() {
-		return deviceType;
+	public WebDriverTestParameters getTestParameters() {
+		return testParameters;
 	}
 	
 	/**

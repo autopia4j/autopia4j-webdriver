@@ -1,7 +1,5 @@
 package com.autopia4j.framework.webdriver.impl.keyword;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +16,6 @@ import com.autopia4j.framework.webdriver.core.TestHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,9 @@ public class KeywordDriverScript extends DriverScript {
 		WebDriver driver = testHarness.initializeWebDriver(testParameters);
 		report = testHarness.initializeTestReport(testParameters, driver);
 		
-		KeywordDatatable dataTable = initializeDatatable(datatablePath);
+		String runTimeDatatablePath =
+				testHarness.getRuntimeDatatablePath(datatablePath, report, testParameters);
+		KeywordDatatable dataTable = initializeDatatable(runTimeDatatablePath);
 		ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		executeTestScript(dataTable, scriptHelper);
 		
@@ -77,56 +76,8 @@ public class KeywordDriverScript extends DriverScript {
 		return nTestcaseRows / nSubIterations;
 	}
 	
-	private KeywordDatatable initializeDatatable(String datatablePath) {
+	private KeywordDatatable initializeDatatable(String runTimeDatatablePath) {
 		logger.info("Initializing datatable");
-		String runTimeDatatablePath;
-		Boolean includeTestDataInReport =
-				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
-		if (includeTestDataInReport) {
-			runTimeDatatablePath = report.getReportSettings().getReportPath() +
-											Util.getFileSeparator() + "datatables";
-			
-			File runTimeDatatable = new File(runTimeDatatablePath + Util.getFileSeparator() +
-												testParameters.getCurrentModule() + ".xls");
-			if (!runTimeDatatable.exists()) {
-				synchronized (KeywordDriverScript.class) {
-					if (!runTimeDatatable.exists()) {
-						File datatable = new File(datatablePath + Util.getFileSeparator() +
-													testParameters.getCurrentModule() + ".xls");
-						
-						try {
-							FileUtils.copyFile(datatable, runTimeDatatable);
-						} catch (IOException e) {
-							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
-							logger.error(errorDescription, e);
-							throw new AutopiaException(errorDescription);
-						}
-					}
-				}
-			}
-			
-			File runTimeCommonDatatable = new File(runTimeDatatablePath +
-													Util.getFileSeparator() +
-													"Common Testdata.xls");
-			if (!runTimeCommonDatatable.exists()) {
-				synchronized (KeywordDriverScript.class) {
-					if (!runTimeCommonDatatable.exists()) {
-						File commonDatatable = new File(datatablePath +
-												Util.getFileSeparator() + "Common Testdata.xls");
-						
-						try {
-							FileUtils.copyFile(commonDatatable, runTimeCommonDatatable);
-						} catch (IOException e) {
-							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
-							logger.error(errorDescription, e);
-							throw new AutopiaException(errorDescription);
-						}
-					}
-				}
-			}
-		} else {
-			runTimeDatatablePath = datatablePath;
-		}
 		
 		KeywordDatatable dataTable =
 				new KeywordDatatable(runTimeDatatablePath, testParameters.getCurrentModule());

@@ -1,8 +1,5 @@
 package com.autopia4j.framework.webdriver.impl.modular;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.datatable.impl.ModularDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
@@ -13,7 +10,6 @@ import com.autopia4j.framework.webdriver.core.ScriptHelper;
 import com.autopia4j.framework.webdriver.core.TestHarness;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +41,9 @@ public class ModularDriverScript extends DriverScript {
 		WebDriver driver = testHarness.initializeWebDriver(testParameters);
 		report = testHarness.initializeTestReport(testParameters, driver);
 		
-		ModularDatatable dataTable = initializeDatatable(datatablePath);
+		String runTimeDatatablePath =
+				testHarness.getRuntimeDatatablePath(datatablePath, report, testParameters);
+		ModularDatatable dataTable = initializeDatatable(runTimeDatatablePath);
 		ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		executeTestScript(dataTable, scriptHelper);
 		
@@ -65,58 +63,11 @@ public class ModularDriverScript extends DriverScript {
 		return testDataAccess.getRowCount(testParameters.getCurrentTestcase(), 0);
 	}
 	
-	private ModularDatatable initializeDatatable(String datatablePath) {
+	private ModularDatatable initializeDatatable(String runTimeDatatablePath) {
 		logger.info("Initializing datatable");
-		String runTimeDatatablePath;
-		Boolean includeTestDataInReport =
-				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
-		if (includeTestDataInReport) {
-			runTimeDatatablePath = report.getReportSettings().getReportPath() +
-											Util.getFileSeparator() + "datatables";
-			
-			File runTimeDatatable = new File(runTimeDatatablePath + Util.getFileSeparator() +
-												testParameters.getCurrentModule() + ".xls");
-			if (!runTimeDatatable.exists()) {
-				synchronized (ModularDriverScript.class) {
-					if (!runTimeDatatable.exists()) {
-						File datatable = new File(datatablePath + Util.getFileSeparator() +
-													testParameters.getCurrentModule() + ".xls");
-						
-						try {
-							FileUtils.copyFile(datatable, runTimeDatatable);
-						} catch (IOException e) {
-							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
-							logger.error(errorDescription, e);
-							throw new AutopiaException(errorDescription);
-						}
-					}
-				}
-			}
-			
-			File runTimeCommonDatatable = new File(runTimeDatatablePath +
-													Util.getFileSeparator() +
-													"Common Testdata.xls");
-			if (!runTimeCommonDatatable.exists()) {
-				synchronized (ModularDriverScript.class) {
-					if (!runTimeCommonDatatable.exists()) {
-						File commonDatatable = new File(datatablePath +
-												Util.getFileSeparator() + "Common Testdata.xls");
-						
-						try {
-							FileUtils.copyFile(commonDatatable, runTimeCommonDatatable);
-						} catch (IOException e) {
-							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
-							logger.error(errorDescription, e);
-							throw new AutopiaException(errorDescription);
-						}
-					}
-				}
-			}
-		} else {
-			runTimeDatatablePath = datatablePath;
-		}
 		
-		ModularDatatable dataTable = new ModularDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
+		ModularDatatable dataTable =
+				new ModularDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 		
 		// Initialize the datatable row in case test data is required during the setUp()

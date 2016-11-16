@@ -1,9 +1,12 @@
 package com.autopia4j.framework.webdriver.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -85,6 +88,11 @@ public class TestHarness {
 	 * @param testParameters The {@link WebDriverTestParameters} object
 	 */
 	public void setDefaultTestParameters(WebDriverTestParameters testParameters) {
+		if (testParameters.getCurrentTestDescription() == "") {
+			logger.info("Test description unspecified. Setting to default value: <Test name>");
+			testParameters.setCurrentTestDescription(testParameters.getCurrentTestcase());
+		}
+		
 		if (testParameters.getIterationMode() == null) {
 			logger.info("Iteration mode unspecified. Setting to default value: All Iterations");
 			testParameters.setIterationMode(IterationOptions.RUN_ALL_ITERATIONS);
@@ -363,6 +371,68 @@ public class TestHarness {
 		}
 		
 		report.addTestLogTableHeadings();
+	}
+	
+	/**
+	 * TODO
+	 * @param datatablePath
+	 * @param report
+	 * @param testParameters
+	 * @return
+	 */
+	public String getRuntimeDatatablePath(String datatablePath,WebDriverReport report,
+													WebDriverTestParameters testParameters) {
+		logger.info("Initializing runtime datatable path");
+		String runTimeDatatablePath;
+		Boolean includeTestDataInReport =
+				Boolean.parseBoolean(properties.getProperty("report.datatable.include"));
+		if (includeTestDataInReport) {
+			runTimeDatatablePath = report.getReportSettings().getReportPath() +
+											Util.getFileSeparator() + "datatables";
+			
+			File runTimeDatatable = new File(runTimeDatatablePath + Util.getFileSeparator() +
+												testParameters.getCurrentModule() + ".xls");
+			if (!runTimeDatatable.exists()) {
+				synchronized (TestHarness.class) {
+					if (!runTimeDatatable.exists()) {
+						File datatable = new File(datatablePath + Util.getFileSeparator() +
+													testParameters.getCurrentModule() + ".xls");
+						
+						try {
+							FileUtils.copyFile(datatable, runTimeDatatable);
+						} catch (IOException e) {
+							String errorDescription = "Error in creating run-time datatable: Copying the datatable failed...";
+							logger.error(errorDescription, e);
+							throw new AutopiaException(errorDescription);
+						}
+					}
+				}
+			}
+			
+			File runTimeCommonDatatable = new File(runTimeDatatablePath +
+													Util.getFileSeparator() +
+													"Common Testdata.xls");
+			if (!runTimeCommonDatatable.exists()) {
+				synchronized (TestHarness.class) {
+					if (!runTimeCommonDatatable.exists()) {
+						File commonDatatable = new File(datatablePath +
+												Util.getFileSeparator() + "Common Testdata.xls");
+						
+						try {
+							FileUtils.copyFile(commonDatatable, runTimeCommonDatatable);
+						} catch (IOException e) {
+							String errorDescription = "Error in creating run-time datatable: Copying the common datatable failed...";
+							logger.error(errorDescription, e);
+							throw new AutopiaException(errorDescription);
+						}
+					}
+				}
+			}
+		} else {
+			runTimeDatatablePath = datatablePath;
+		}
+		
+		return runTimeDatatablePath;
 	}
 	
 	/**
