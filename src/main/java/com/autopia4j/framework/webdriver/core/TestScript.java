@@ -4,9 +4,16 @@ import org.testng.ITestContext;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
+/**
+ * Abstract base class for test scripts developed using the autopia4j framework
+ * @author vj
+ */
 public abstract class TestScript {
 	
-	protected TestBatchHarness testBatchHarness;
+	/**
+	 * The {@link TestBatchHarness} object managing the current test batch execution
+	 */
+	protected TestBatchHarness testBatchHarness = TestBatchHarness.getInstance();
 	
 	
 	/**
@@ -15,8 +22,6 @@ public abstract class TestScript {
 	 */
 	@BeforeSuite
 	public void setUpTestSuite(ITestContext testContext) {
-		testBatchHarness = TestBatchHarness.getInstance();
-		
 		if (System.getProperty("autopia.run.configuration") == null) {
 			System.setProperty("autopia.run.configuration", testContext.getSuite().getName());
 		}

@@ -15,7 +15,7 @@ import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
 
 /**
- * Abstract base class for all the test cases to be automated
+ * Abstract base class for test scripts developed using the autopia4j modular implementation
  * @author vj
  */
 public abstract class ModularTestScript extends TestScript {

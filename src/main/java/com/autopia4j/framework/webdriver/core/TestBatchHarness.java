@@ -33,8 +33,7 @@ public class TestBatchHarness {
 	private FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
 	private Properties properties;
 	
-	private static final TestBatchHarness RESULT_SUMMARY_MANAGER =
-													new TestBatchHarness();
+	private static final TestBatchHarness TEST_BATCH_HARNESS = new TestBatchHarness();
 	
 	private TestBatchHarness() {
 		// To prevent external instantiation of this class
@@ -45,7 +44,7 @@ public class TestBatchHarness {
 	 * @return Instance of the {@link TestBatchHarness} object
 	 */
 	public static TestBatchHarness getInstance() {
-		return RESULT_SUMMARY_MANAGER;
+		return TEST_BATCH_HARNESS;
 	}
 	
 	@Override

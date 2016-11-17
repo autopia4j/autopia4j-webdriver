@@ -12,7 +12,7 @@ import org.testng.annotations.BeforeMethod;
 
 
 /**
- * Abstract base class for all the test cases to be automated
+ * Abstract base class for test scripts developed using the autopia4j keyword-driven implementation
  * @author vj
  */
 public abstract class KeywordTestScript extends TestScript {

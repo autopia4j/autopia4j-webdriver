@@ -20,7 +20,12 @@ import com.autopia4j.framework.webdriver.core.TestScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
+/**
+ * Abstract base class for test scripts developed using the autopia4j simple implementation
+ * @author vj
+ */
 public abstract class SimpleTestScript extends TestScript {
+	
 	private final Logger logger = LoggerFactory.getLogger(SimpleTestScript.class);
 	
 	/**
@@ -28,14 +33,28 @@ public abstract class SimpleTestScript extends TestScript {
 	 */
 	protected FrameworkParameters frameworkParameters = FrameworkParameters.getInstance();
 	
+	/**
+	 * The {@link ThreadLocal} instance of the {@link TestHarness} for the current test method
+	 */
 	protected ThreadLocal<TestHarness> currentTestHarness = new ThreadLocal<>();
+	/**
+	 * The {@link ThreadLocal} instance of the {@link WebDriverTestParameters} for the current test method
+	 */
 	protected ThreadLocal<WebDriverTestParameters> currentTestParameters = new ThreadLocal<>();
+	/**
+	 * The {@link ThreadLocal} instance of the {@link ScriptHelper} object for the current test method
+	 */
 	protected ThreadLocal<ScriptHelper> currentScriptHelper = new ThreadLocal<>();
+	/**
+	 * The {@link ThreadLocal} instance of the {@link WebDriverReport} object for the current test method
+	 */
 	protected ThreadLocal<WebDriverReport> currentReport = new ThreadLocal<>();
 	
 	
 	/**
 	 * Function to do the required framework setup activities before executing each test case
+	 * @param currentMethod The current test {@link Method} being executed
+	 * @param currentMethodParams The array of parameters being passed into the current method
 	 */
 	@BeforeMethod
 	public void setUpTestRunner(Method currentMethod, Object[] currentMethodParams) {
@@ -94,6 +113,7 @@ public abstract class SimpleTestScript extends TestScript {
 	
 	/**
 	 * Function to do the required framework tear-down activities after executing each test case
+	 * @param testResult The {@link ITestResult} of the current test method getting executed
 	 */
 	@AfterMethod(alwaysRun=true)
 	public synchronized void tearDownTestRunner(ITestResult testResult) {
