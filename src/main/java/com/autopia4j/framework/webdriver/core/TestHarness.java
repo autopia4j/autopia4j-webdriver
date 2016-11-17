@@ -374,13 +374,13 @@ public class TestHarness {
 	}
 	
 	/**
-	 * TODO
-	 * @param datatablePath
-	 * @param report
-	 * @param testParameters
-	 * @return
+	 * Function to get the run-time datatable path, based on the "report.datatable.include" setting
+	 * @param datatablePath The base datatable path
+	 * @param report The {@link WebDriverReport} object
+	 * @param testParameters The {@link WebDriverTestParameters} object
+	 * @return The run-time datatable path
 	 */
-	public String getRuntimeDatatablePath(String datatablePath,WebDriverReport report,
+	public String getRuntimeDatatablePath(String datatablePath, WebDriverReport report,
 													WebDriverTestParameters testParameters) {
 		logger.info("Initializing runtime datatable path");
 		String runTimeDatatablePath;
