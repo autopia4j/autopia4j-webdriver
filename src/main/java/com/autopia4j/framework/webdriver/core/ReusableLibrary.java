@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.datatable.DataTableType;
+import com.autopia4j.framework.datatable.DataTable;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
@@ -26,9 +26,9 @@ public abstract class ReusableLibrary {
 	 */
 	protected final WebDriverTestParameters testParameters;
 	/**
-	 * The {@link DataTableType} object (passed from the test script)
+	 * The {@link DataTable} object (passed from the test script)
 	 */
-	protected final DataTableType dataTable;
+	protected final DataTable dataTable;
 	/**
 	 * The {@link WebDriverReport} object (passed from the test script)
 	 */

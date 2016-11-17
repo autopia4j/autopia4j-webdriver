@@ -3,7 +3,7 @@ package com.autopia4j.framework.webdriver.core;
 import org.openqa.selenium.WebDriver;
 
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.datatable.DataTableType;
+import com.autopia4j.framework.datatable.DataTable;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 import com.autopia4j.framework.webdriver.utils.GalenUtil;
 import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
@@ -15,7 +15,7 @@ import com.autopia4j.framework.webdriver.utils.WebDriverUtil;
  */
 public class ScriptHelper {
 	private final WebDriverTestParameters testParameters;
-	private final DataTableType dataTable;
+	private final DataTable dataTable;
 	private final WebDriverReport report;
 	private final WebDriver driver;
 	private final WebDriverUtil driverUtil;
@@ -25,11 +25,11 @@ public class ScriptHelper {
 	/**
 	 * Constructor to initialize all the objects wrapped by the {@link ScriptHelper} class
 	 * @param testParameters The {@link WebDriverTestParameters} object
-	 * @param dataTable The {@link DataTableType} object
+	 * @param dataTable The {@link DataTable} object
 	 * @param report The {@link WebDriverReport} object
 	 * @param driver The {@link WebDriver} object
 	 */
-	public ScriptHelper(WebDriverTestParameters testParameters, DataTableType dataTable,
+	public ScriptHelper(WebDriverTestParameters testParameters, DataTable dataTable,
 						WebDriverReport report, WebDriver driver) {
 		this.testParameters = testParameters;
 		this.dataTable = dataTable;
@@ -53,10 +53,10 @@ public class ScriptHelper {
 	}
 	
 	/**
-	 * Function to get the {@link DataTableType} object
-	 * @return The {@link DataTableType} object
+	 * Function to get the {@link DataTable} object
+	 * @return The {@link DataTable} object
 	 */
-	public DataTableType getDataTable() {
+	public DataTable getDataTable() {
 		return dataTable;
 	}
 	
