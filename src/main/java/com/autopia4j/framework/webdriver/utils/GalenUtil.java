@@ -33,6 +33,7 @@ public class GalenUtil {
 	private final WebDriverReport report;
 	private final ReportSettings reportSettings;
 	private List<GalenTestInfo> galenTests;
+	private Boolean layoutAsExpected = true;
 	
 	
 	/**
@@ -76,6 +77,7 @@ public class GalenUtil {
 			}
 			
 			if(layoutReport.errors() > 0) {
+				layoutAsExpected = false;
 				report.updateTestLog("Galen Test", reportTitle, Status.FAIL);
 			} else {
 				report.updateTestLog("Galen Test", reportTitle, Status.PASS);
@@ -100,6 +102,14 @@ public class GalenUtil {
 			logger.error("Error occurred while generating Galen page dump!", e);
 			throw new AutopiaException(e.getMessage());
 		}
+	}
+	
+	/**
+	 * Function to return a Boolean value indicating whether or not the page layout was as expected
+	 * @return Boolean value indicating whether or not the page layout was as expected
+	 */
+	public Boolean isPageLayoutAsExpected() {
+		return layoutAsExpected;
 	}
 	
 	/**

@@ -2,7 +2,6 @@ package com.autopia4j.framework.webdriver.impl.basic;
 
 import java.lang.reflect.Method;
 import org.openqa.selenium.WebDriver;
-import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -13,6 +12,7 @@ import com.autopia4j.framework.webdriver.core.TestHarness;
 import com.autopia4j.framework.webdriver.core.TestScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
+
 
 /**
  * Abstract base class for test scripts developed using the autopia4j simple implementation
@@ -87,10 +87,9 @@ public abstract class BasicTestScript extends TestScript {
 	
 	/**
 	 * Function to do the required framework tear-down activities after executing each test case
-	 * @param testResult The {@link ITestResult} of the current test method getting executed
 	 */
 	@AfterMethod(alwaysRun=true)
-	public synchronized void tearDownTestRunner(ITestResult testResult) {
+	public synchronized void tearDownTestRunner() {
 		TestHarness testHarness = currentTestHarness.get();
 		ScriptHelper scriptHelper = currentScriptHelper.get();
 		
@@ -104,7 +103,7 @@ public abstract class BasicTestScript extends TestScript {
 		testHarness.quitWebDriver(driver);
 		String executionTime = testHarness.tearDown(scriptHelper);
 		String testReportName = report.getReportSettings().getReportName();
-		String testStatus = testResult.isSuccess() ? "Passed":"Failed";
+		String testStatus = report.getTestStatus();
 		
 		testHarness.closeTestReport(scriptHelper, executionTime);
 		testBatchHarness.updateResultSummary(testParameters, testReportName,

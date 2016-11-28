@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.autopia4j.framework</groupId>
   <artifactId>autopia4j-webdriver</artifactId>
-  <version>1.7.3</version>
+  <version>1.7.4</version>
   <name>autopia4j framework for webdriver</name>
   <description>autopia4j framework for webdriver</description>
   <build>
@@ -41,14 +41,9 @@
   		</exclusions>
   	</dependency>
   	<dependency>
-  		<groupId>org.testng</groupId>
-  		<artifactId>testng</artifactId>
-  		<version>6.8</version>
-  	</dependency>
-  	<dependency>
   		<groupId>com.autopia4j.framework</groupId>
   		<artifactId>autopia4j-core</artifactId>
-  		<version>1.1.6</version>
+  		<version>1.2.1</version>
   	</dependency>
   	<dependency>
   		<groupId>io.github.lukehutch</groupId>
