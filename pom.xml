@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.autopia4j.framework</groupId>
   <artifactId>autopia4j-webdriver</artifactId>
-  <version>1.7.4</version>
+  <version>1.7.5</version>
   <name>autopia4j framework for webdriver</name>
   <description>autopia4j framework for webdriver</description>
   <build>
@@ -43,7 +43,7 @@
   	<dependency>
   		<groupId>com.autopia4j.framework</groupId>
   		<artifactId>autopia4j-core</artifactId>
-  		<version>1.2.1</version>
+  		<version>1.2.3</version>
   	</dependency>
   	<dependency>
   		<groupId>io.github.lukehutch</groupId>

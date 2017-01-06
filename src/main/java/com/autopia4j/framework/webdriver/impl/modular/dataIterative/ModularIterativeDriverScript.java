@@ -1,7 +1,7 @@
-package com.autopia4j.framework.webdriver.impl.modular;
+package com.autopia4j.framework.webdriver.impl.modular.dataIterative;
 
 import com.autopia4j.framework.core.AutopiaException;
-import com.autopia4j.framework.datatable.impl.ModularDatatable;
+import com.autopia4j.framework.datatable.impl.IterativeDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DriverScript;
@@ -19,15 +19,15 @@ import org.slf4j.LoggerFactory;
  * Driver script class which encapsulates the core logic of the framework
  * @author vj
  */
-public class ModularDriverScript extends DriverScript {
-	private final Logger logger = LoggerFactory.getLogger(ModularDriverScript.class);
+public class ModularIterativeDriverScript extends DriverScript {
+	private final Logger logger = LoggerFactory.getLogger(ModularIterativeDriverScript.class);
 	
 	
 	/**
 	 * DriverScript constructor
 	 * @param testParameters A {@link WebDriverTestParameters} object
 	 */
-	public ModularDriverScript(WebDriverTestParameters testParameters) {
+	public ModularIterativeDriverScript(WebDriverTestParameters testParameters) {
 		super(testParameters);
 	}
 	
@@ -43,7 +43,7 @@ public class ModularDriverScript extends DriverScript {
 		
 		String runTimeDatatablePath =
 				testHarness.getRuntimeDatatablePath(datatablePath, report, testParameters);
-		ModularDatatable dataTable = initializeDatatable(runTimeDatatablePath);
+		IterativeDatatable dataTable = initializeDatatable(runTimeDatatablePath);
 		ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		executeTestScript(dataTable, scriptHelper);
 		
@@ -63,11 +63,11 @@ public class ModularDriverScript extends DriverScript {
 		return testDataAccess.getRowCount(testParameters.getCurrentTestcase(), 0);
 	}
 	
-	private ModularDatatable initializeDatatable(String runTimeDatatablePath) {
+	private IterativeDatatable initializeDatatable(String runTimeDatatablePath) {
 		logger.info("Initializing datatable");
 		
-		ModularDatatable dataTable =
-				new ModularDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
+		IterativeDatatable dataTable =
+				new IterativeDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 		
 		// Initialize the datatable row in case test data is required during the setUp()
@@ -76,8 +76,8 @@ public class ModularDriverScript extends DriverScript {
 		return dataTable;
 	}
 	
-	private void executeTestScript(ModularDatatable dataTable, ScriptHelper scriptHelper) {
-		ModularTestScript testScript = getTestScriptInstance();
+	private void executeTestScript(IterativeDatatable dataTable, ScriptHelper scriptHelper) {
+		ModularIterativeTestScript testScript = getTestScriptInstance();
 		testScript.initialize(scriptHelper);
 		
 		try {
@@ -94,7 +94,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 	}
 	
-	private ModularTestScript getTestScriptInstance() {
+	private ModularIterativeTestScript getTestScriptInstance() {
 		Class<?> testScriptClass;
 		try {
 			testScriptClass = Class.forName(frameworkParameters.getBasePackageName() +
@@ -109,7 +109,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 		
 		try {
-			return (ModularTestScript) testScriptClass.newInstance();
+			return (ModularIterativeTestScript) testScriptClass.newInstance();
 		} catch (Exception e) {
 			String errorDescription = "Error while instantiating the specified test script";
 			logger.error(errorDescription, e);
@@ -117,7 +117,7 @@ public class ModularDriverScript extends DriverScript {
 		}
 	}
 	
-	private void executeTestIterations(ModularTestScript testScript, ModularDatatable dataTable) {
+	private void executeTestIterations(ModularIterativeTestScript testScript, IterativeDatatable dataTable) {
 		while(currentIteration <= testParameters.getEndIteration()) {
 			report.addTestLogSection("Iteration: " + Integer.toString(currentIteration));
 			

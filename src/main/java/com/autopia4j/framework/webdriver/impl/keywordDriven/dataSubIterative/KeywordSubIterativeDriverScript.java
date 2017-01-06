@@ -1,11 +1,11 @@
-package com.autopia4j.framework.webdriver.impl.keyword;
+package com.autopia4j.framework.webdriver.impl.keywordDriven.dataSubIterative;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.autopia4j.framework.core.AutopiaException;
-import com.autopia4j.framework.datatable.impl.KeywordDatatable;
+import com.autopia4j.framework.datatable.impl.SubIterativeDatatable;
 import com.autopia4j.framework.utils.ExcelDataAccess;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.DriverScript;
@@ -27,8 +27,8 @@ import java.lang.reflect.*;
  * Driver script class which encapsulates the core logic of the framework
  * @author vj
  */
-public class KeywordDriverScript extends DriverScript {
-	private final Logger logger = LoggerFactory.getLogger(KeywordDriverScript.class);
+public class KeywordSubIterativeDriverScript extends DriverScript {
+	private final Logger logger = LoggerFactory.getLogger(KeywordSubIterativeDriverScript.class);
 	
 	private int currentSubIteration;
 	
@@ -36,7 +36,7 @@ public class KeywordDriverScript extends DriverScript {
 	 * DriverScript constructor
 	 * @param testParameters A {@link WebDriverTestParameters} object
 	 */
-	public KeywordDriverScript(WebDriverTestParameters testParameters) {
+	public KeywordSubIterativeDriverScript(WebDriverTestParameters testParameters) {
 		super(testParameters);
 	}
 	
@@ -52,7 +52,7 @@ public class KeywordDriverScript extends DriverScript {
 		
 		String runTimeDatatablePath =
 				testHarness.getRuntimeDatatablePath(datatablePath, report, testParameters);
-		KeywordDatatable dataTable = initializeDatatable(runTimeDatatablePath);
+		SubIterativeDatatable dataTable = initializeDatatable(runTimeDatatablePath);
 		ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 		executeTestScript(dataTable, scriptHelper);
 		
@@ -76,17 +76,17 @@ public class KeywordDriverScript extends DriverScript {
 		return nTestcaseRows / nSubIterations;
 	}
 	
-	private KeywordDatatable initializeDatatable(String runTimeDatatablePath) {
+	private SubIterativeDatatable initializeDatatable(String runTimeDatatablePath) {
 		logger.info("Initializing datatable");
 		
-		KeywordDatatable dataTable =
-				new KeywordDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
+		SubIterativeDatatable dataTable =
+				new SubIterativeDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 		
 		return dataTable;
 	}
 	
-	private void executeTestScript(KeywordDatatable datatable, ScriptHelper scriptHelper) {
+	private void executeTestScript(SubIterativeDatatable datatable, ScriptHelper scriptHelper) {
 		List<String> businessFlowData = getBusinessFlowData(datatable.getDatatablePath());
 		executeTestIterations(businessFlowData, datatable, scriptHelper);
 	}
@@ -125,7 +125,7 @@ public class KeywordDriverScript extends DriverScript {
 		return businessFlowData;
 	}
 	
-	private void executeTestIterations(List<String> businessFlowData, KeywordDatatable datatable, ScriptHelper scriptHelper) {
+	private void executeTestIterations(List<String> businessFlowData, SubIterativeDatatable datatable, ScriptHelper scriptHelper) {
 		while(currentIteration <= testParameters.getEndIteration()) {
 			report.addTestLogSection("Iteration: " + Integer.toString(currentIteration));
 			
@@ -145,7 +145,7 @@ public class KeywordDriverScript extends DriverScript {
 		}
 	}
 	
-	private void processBusinessFlow(List<String> businessFlowData, KeywordDatatable dataTable, ScriptHelper scriptHelper)
+	private void processBusinessFlow(List<String> businessFlowData, SubIterativeDatatable dataTable, ScriptHelper scriptHelper)
 			throws IllegalAccessException, InvocationTargetException,
 			ClassNotFoundException, InstantiationException {
 		Map<String, Integer> keywordDirectory = new HashMap<>();

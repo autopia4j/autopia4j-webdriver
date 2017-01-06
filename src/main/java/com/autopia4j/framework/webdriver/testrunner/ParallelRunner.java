@@ -7,8 +7,8 @@ import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.TestBatchHarness;
-import com.autopia4j.framework.webdriver.impl.modular.ModularDriverScript;
-import com.autopia4j.framework.webdriver.impl.keyword.KeywordDriverScript;
+import com.autopia4j.framework.webdriver.impl.keywordDriven.dataSubIterative.KeywordSubIterativeDriverScript;
+import com.autopia4j.framework.webdriver.impl.modular.dataIterative.ModularIterativeDriverScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 
 /**
@@ -55,17 +55,18 @@ class ParallelRunner implements Runnable {
 			DriverScript driverScript;
 			
 			switch(frameworkParameters.getFrameworkType()) {
-			case KEYWORD_DRIVEN:
-				driverScript = new KeywordDriverScript(this.testParameters);
+			case KEYWORD_SUBITERATIVE:
+				driverScript = new KeywordSubIterativeDriverScript(this.testParameters);
 				break;
 				
-			case MODULAR:
-				driverScript = new ModularDriverScript(this.testParameters);
+			case MODULAR_ITERATIVE:
+				driverScript = new ModularIterativeDriverScript(this.testParameters);
 				//TODO: Directly instantiate the test script class and pass it in here
 				break;
 				
 			default:
-				throw new AutopiaException("Unknown framework type!");	
+				throw new AutopiaException("The batch runner does not support the framework type: " +
+																frameworkParameters.getFrameworkType());	
 			}
 			
 			try {

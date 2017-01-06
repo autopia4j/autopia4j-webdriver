@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.impl.modular;
+package com.autopia4j.framework.webdriver.impl.modular.dataIterative;
 
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -6,7 +6,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import com.autopia4j.framework.core.FrameworkParameters;
-import com.autopia4j.framework.datatable.impl.ModularDatatable;
+import com.autopia4j.framework.datatable.impl.IterativeDatatable;
 import com.autopia4j.framework.utils.Util;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
 import com.autopia4j.framework.webdriver.core.TestScript;
@@ -18,15 +18,15 @@ import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
  * Abstract base class for test scripts developed using the autopia4j modular implementation
  * @author vj
  */
-public abstract class ModularTestScript extends TestScript {
+public abstract class ModularIterativeTestScript extends TestScript {
 	/**
 	 * The {@link ScriptHelper} object (required for calling one reusable library from another)
 	 */
 	protected ScriptHelper scriptHelper;
 	/**
-	 * The {@link ModularDatatable} object (passed from the Driver script)
+	 * The {@link IterativeDatatable} object (passed from the Driver script)
 	 */
-	protected ModularDatatable dataTable;
+	protected IterativeDatatable dataTable;
 	/**
 	 * The {@link WebDriverReport} object (passed from the Driver script)
 	 */
@@ -41,7 +41,7 @@ public abstract class ModularTestScript extends TestScript {
 	 */
 	protected String currentTest;
 	
-	private ThreadLocal<ModularDriverScript> currentDriverScript = new ThreadLocal<>();
+	private ThreadLocal<ModularIterativeDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
 	/**
@@ -52,7 +52,7 @@ public abstract class ModularTestScript extends TestScript {
 	public void initialize(ScriptHelper scriptHelper) {
 		this.scriptHelper = scriptHelper;
 		
-		this.dataTable = (ModularDatatable) scriptHelper.getDataTable();
+		this.dataTable = (IterativeDatatable) scriptHelper.getDataTable();
 		this.report = scriptHelper.getReport();
 	}
 	
@@ -95,9 +95,9 @@ public abstract class ModularTestScript extends TestScript {
 	
 	/**
 	 * {@link Assert} that the test execution passed
-	 * @param driverScript The {@link ModularDriverScript} object
+	 * @param driverScript The {@link ModularIterativeDriverScript} object
 	 */
-	protected void assertTestPassed(ModularDriverScript driverScript) {
+	protected void assertTestPassed(ModularIterativeDriverScript driverScript) {
 		currentDriverScript.set(driverScript);
 		if("Failed".equalsIgnoreCase(driverScript.getTestStatus())) {
 			Assert.fail(driverScript.getFailureDescription());
@@ -109,7 +109,7 @@ public abstract class ModularTestScript extends TestScript {
 	 */
 	@AfterMethod(alwaysRun=true)
 	public synchronized void tearDownTestRunner() {
-		ModularDriverScript driverScript = currentDriverScript.get();
+		ModularIterativeDriverScript driverScript = currentDriverScript.get();
 		WebDriverTestParameters testParameters = driverScript.getTestParameters();
 		String testReportName = driverScript.getReportName();
 		String executionTime = driverScript.getExecutionTime();

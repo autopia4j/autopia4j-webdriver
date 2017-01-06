@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.impl.simple;
+package com.autopia4j.framework.webdriver.impl.modular.dataNonIterative;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -12,7 +12,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.core.Settings;
-import com.autopia4j.framework.datatable.impl.SimpleDatatable;
+import com.autopia4j.framework.datatable.impl.NonIterativeDatatable;
 import com.autopia4j.framework.webdriver.core.ExecutionMode;
 import com.autopia4j.framework.webdriver.core.ScriptHelper;
 import com.autopia4j.framework.webdriver.core.TestHarness;
@@ -24,9 +24,9 @@ import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
  * Abstract base class for test scripts developed using the autopia4j simple implementation
  * @author vj
  */
-public abstract class SimpleTestScript extends TestScript {
+public abstract class ModularNonIterativeTestScript extends TestScript {
 	
-	private final Logger logger = LoggerFactory.getLogger(SimpleTestScript.class);
+	private final Logger logger = LoggerFactory.getLogger(ModularNonIterativeTestScript.class);
 	
 	/**
 	 * The {@link FrameworkParameters} object
@@ -91,20 +91,20 @@ public abstract class SimpleTestScript extends TestScript {
 			String datatablePath = testHarness.getDatatablePath();
 			String runTimeDatatablePath =
 					testHarness.getRuntimeDatatablePath(datatablePath, report, testParameters);
-			SimpleDatatable dataTable = initializeDatatable(runTimeDatatablePath);
+			NonIterativeDatatable dataTable = initializeDatatable(runTimeDatatablePath);
 			
 			ScriptHelper scriptHelper = new ScriptHelper(testParameters, dataTable, report, driver);
 			currentScriptHelper.set(scriptHelper);
 		}
 	}
 	
-	private SimpleDatatable initializeDatatable(String runTimeDatatablePath) {
+	private NonIterativeDatatable initializeDatatable(String runTimeDatatablePath) {
 		logger.info("Initializing datatable");
 		
 		WebDriverTestParameters testParameters = currentTestParameters.get();
 		Properties properties = Settings.getInstance();
 		
-		SimpleDatatable dataTable = new SimpleDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
+		NonIterativeDatatable dataTable = new NonIterativeDatatable(runTimeDatatablePath, testParameters.getCurrentModule());
 		dataTable.setDataReferenceIdentifier(properties.getProperty("datatable.reference.identifier"));
 		dataTable.setCurrentRow(testParameters.getCurrentTestcase());
 		

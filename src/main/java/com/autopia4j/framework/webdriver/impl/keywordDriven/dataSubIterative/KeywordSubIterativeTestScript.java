@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.impl.keyword;
+package com.autopia4j.framework.webdriver.impl.keywordDriven.dataSubIterative;
 
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.utils.Util;
@@ -15,7 +15,7 @@ import org.testng.annotations.BeforeMethod;
  * Abstract base class for test scripts developed using the autopia4j keyword-driven implementation
  * @author vj
  */
-public abstract class KeywordTestScript extends TestScript {
+public abstract class KeywordSubIterativeTestScript extends TestScript {
 	/**
 	 * The name of the current module
 	 */
@@ -25,7 +25,7 @@ public abstract class KeywordTestScript extends TestScript {
 	 */
 	protected String currentTest;
 	
-	private ThreadLocal<KeywordDriverScript> currentDriverScript = new ThreadLocal<>();
+	private ThreadLocal<KeywordSubIterativeDriverScript> currentDriverScript = new ThreadLocal<>();
 	
 	
 	/**
@@ -50,9 +50,9 @@ public abstract class KeywordTestScript extends TestScript {
 	
 	/**
 	 * {@link Assert} that the test execution passed
-	 * @param driverScript The {@link KeywordDriverScript} object
+	 * @param driverScript The {@link KeywordSubIterativeDriverScript} object
 	 */
-	protected void assertTestPassed(KeywordDriverScript driverScript) {
+	protected void assertTestPassed(KeywordSubIterativeDriverScript driverScript) {
 		currentDriverScript.set(driverScript);
 		if("Failed".equalsIgnoreCase(driverScript.getTestStatus())) {
 			Assert.fail(driverScript.getFailureDescription());
@@ -64,7 +64,7 @@ public abstract class KeywordTestScript extends TestScript {
 	 */
 	@AfterMethod(alwaysRun=true)
 	public synchronized void tearDownTestRunner() {
-		KeywordDriverScript driverScript = currentDriverScript.get();
+		KeywordSubIterativeDriverScript driverScript = currentDriverScript.get();
 		WebDriverTestParameters testParameters = driverScript.getTestParameters();
 		String testReportName = driverScript.getReportName();
 		String executionTime = driverScript.getExecutionTime();

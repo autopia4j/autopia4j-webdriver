@@ -1,4 +1,4 @@
-package com.autopia4j.framework.webdriver.impl.basic;
+package com.autopia4j.framework.webdriver.impl.modular.basic;
 
 import java.lang.reflect.Method;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +18,7 @@ import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
  * Abstract base class for test scripts developed using the autopia4j simple implementation
  * @author vj
  */
-public abstract class BasicTestScript extends TestScript {
+public abstract class ModularBasicTestScript extends TestScript {
 	
 	/**
 	 * The {@link FrameworkParameters} object
