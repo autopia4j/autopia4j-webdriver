@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.autopia4j.framework</groupId>
   <artifactId>autopia4j-webdriver</artifactId>
-  <version>1.7.5</version>
+  <version>1.7.6</version>
   <name>autopia4j framework for webdriver</name>
   <description>autopia4j framework for webdriver</description>
   <build>

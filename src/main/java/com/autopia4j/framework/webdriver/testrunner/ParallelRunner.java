@@ -7,6 +7,7 @@ import com.autopia4j.framework.core.AutopiaException;
 import com.autopia4j.framework.core.FrameworkParameters;
 import com.autopia4j.framework.webdriver.core.DriverScript;
 import com.autopia4j.framework.webdriver.core.TestBatchHarness;
+import com.autopia4j.framework.webdriver.impl.keywordDriven.dataNonIterative.KeywordNonIterativeDriverScript;
 import com.autopia4j.framework.webdriver.impl.keywordDriven.dataSubIterative.KeywordSubIterativeDriverScript;
 import com.autopia4j.framework.webdriver.impl.modular.dataIterative.ModularIterativeDriverScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
@@ -55,6 +56,10 @@ class ParallelRunner implements Runnable {
 			DriverScript driverScript;
 			
 			switch(frameworkParameters.getFrameworkType()) {
+			case KEYWORD_NONITERATIVE:
+				driverScript = new KeywordNonIterativeDriverScript(this.testParameters);
+				break;
+				
 			case KEYWORD_SUBITERATIVE:
 				driverScript = new KeywordSubIterativeDriverScript(this.testParameters);
 				break;

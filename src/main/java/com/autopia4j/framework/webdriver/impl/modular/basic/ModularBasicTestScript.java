@@ -13,7 +13,6 @@ import com.autopia4j.framework.webdriver.core.TestScript;
 import com.autopia4j.framework.webdriver.core.WebDriverTestParameters;
 import com.autopia4j.framework.webdriver.reporting.WebDriverReport;
 
-
 /**
  * Abstract base class for test scripts developed using the autopia4j simple implementation
  * @author vj

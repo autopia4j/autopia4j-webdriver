@@ -6,7 +6,6 @@ import java.util.Properties;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -113,10 +112,9 @@ public abstract class ModularNonIterativeTestScript extends TestScript {
 	
 	/**
 	 * Function to do the required framework tear-down activities after executing each test case
-	 * @param testResult The {@link ITestResult} of the current test method getting executed
 	 */
 	@AfterMethod(alwaysRun=true)
-	public synchronized void tearDownTestRunner(ITestResult testResult) {
+	public synchronized void tearDownTestRunner() {
 		TestHarness testHarness = currentTestHarness.get();
 		ScriptHelper scriptHelper = currentScriptHelper.get();
 		
@@ -130,7 +128,7 @@ public abstract class ModularNonIterativeTestScript extends TestScript {
 		testHarness.quitWebDriver(driver);
 		String executionTime = testHarness.tearDown(scriptHelper);
 		String testReportName = report.getReportSettings().getReportName();
-		String testStatus = testResult.isSuccess() ? "Passed":"Failed";
+		String testStatus = report.getTestStatus();
 		
 		testHarness.closeTestReport(scriptHelper, executionTime);
 		testBatchHarness.updateResultSummary(testParameters, testReportName,

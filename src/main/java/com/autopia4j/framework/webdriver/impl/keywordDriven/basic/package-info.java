@@ -1,6 +1,6 @@
 /**
- * Core library of the autopia4j basic keyword driven implementation for Selenium WebDriver<br>
- * This library is designed specifically for testing web applications (desktop as well as mobile), and integrates with Selenium WebDriver, Galen, Appium and Perfecto Mobile
+ * It does not make sense to have a keyword driven implementation with data managed from code!<br>
+ * Hence, there will be no autopia4j basic keyword driven implementation for Selenium WebDriver
  * @author vj
  */
 package com.autopia4j.framework.webdriver.impl.keywordDriven.basic;
