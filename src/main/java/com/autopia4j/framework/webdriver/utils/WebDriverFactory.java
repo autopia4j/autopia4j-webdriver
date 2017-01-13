@@ -92,11 +92,11 @@ public class WebDriverFactory {
 			break;
 			
 		case FIREFOX:
-			driver = getFirefoxDriver();
+			driver = getGeckoDriver();
 			break;
 			
-		case FIREFOX_MARIONETTE:
-			driver = getMarionetteDriver();
+		case FIREFOX_LEGACY:
+			driver = getFirefoxLegacyDriver();
 			break;
 			
 		case GHOST_DRIVER:
@@ -150,19 +150,7 @@ public class WebDriverFactory {
 		return new EdgeDriver(desiredCapabilities);
 	}
 	
-	private static WebDriver getFirefoxDriver() {
-		// Takes the system proxy settings automatically
-		
-		// Sample code to specify path of Firefox binaries
-		//System.setProperty("webdriver.firefox.bin",
-		//		"C:\\Users\\vramas\\AppData\\Local\\Mozilla Firefox\\firefox.exe");
-		
-		FirefoxProfile firefoxProfile = new FirefoxProfile();
-		firefoxProfile.setAcceptUntrustedCertificates(acceptAllSslCertificates);
-		return new FirefoxDriver(firefoxProfile);
-	}
-	
-	private static WebDriver getMarionetteDriver() {
+	private static WebDriver getGeckoDriver() {
 		// Takes the system proxy settings automatically
 		
 		FirefoxProfile marionetteProfile = new FirefoxProfile();
@@ -174,6 +162,18 @@ public class WebDriverFactory {
 		desiredCapabilities.setCapability(FirefoxDriver.PROFILE, marionetteProfile);
 		
 		return new FirefoxDriver(desiredCapabilities);
+	}
+	
+	private static WebDriver getFirefoxLegacyDriver() {
+		// Takes the system proxy settings automatically
+		
+		// Sample code to specify path of Firefox binaries
+		//System.setProperty("webdriver.firefox.bin",
+		//		"C:\\Users\\vramas\\AppData\\Local\\Mozilla Firefox\\firefox.exe");
+		
+		FirefoxProfile firefoxProfile = new FirefoxProfile();
+		firefoxProfile.setAcceptUntrustedCertificates(acceptAllSslCertificates);
+		return new FirefoxDriver(firefoxProfile);
 	}
 	
 	private static WebDriver getPhantomJsDriver() {

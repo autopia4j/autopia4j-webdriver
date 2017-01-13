@@ -66,7 +66,10 @@ public class PerfectoWebDriverFactory {
 	}
 	
 	private static DesiredCapabilities getPerfectoExecutionCapabilities(Browser browser) {
-		validatePerfectoSupports(browser);
+		if(!browser.toString().contains("PERFECTO")) {
+			throw new AutopiaException("The browser " + browser.toString() +
+											" is not supported on the Perfecto MobileCloud");
+		}
 		
 		DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
 		desiredCapabilities.setBrowserName(browser.getValue());
@@ -78,20 +81,6 @@ public class PerfectoWebDriverFactory {
 		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
 		
 		return desiredCapabilities;
-	}
-	
-	private static void validatePerfectoSupports(Browser browser) {
-		switch (browser) {
-		case INTERNET_EXPLORER:
-		case FIREFOX:
-		case HTML_UNIT:
-		case OPERA:
-			throw new AutopiaException("The browser " + browser.toString() +
-											" is not supported on the Perfecto MobileCloud");
-			
-		default:
-			break;
-		}
 	}
 	
 	private static String getOrientation(DeviceType deviceType) {

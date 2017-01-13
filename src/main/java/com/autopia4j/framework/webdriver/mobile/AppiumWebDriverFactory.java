@@ -37,19 +37,8 @@ public class AppiumWebDriverFactory {
 	 */
 	public static WebDriver getAppiumWebDriver(String deviceName, ScreenOrientation screenOrientation,
 											Browser browser, Platform platform, URL remoteUrl) {
+		DesiredCapabilities desiredCapabilities = getAppiumDesiredCapabilities(deviceName, browser, platform);
 		AppiumDriver<WebElement> driver;
-		DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
-		
-		//desiredCapabilities.setCapability("deviceName", deviceName);
-		desiredCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
-		desiredCapabilities.setCapability(MobileCapabilityType.BROWSER_NAME, browser.getValue());
-		String platformName = getAppiumPlatformName(platform);
-		desiredCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, platformName);
-		
-		// The capabilities below only work with emulators/simulators
-		//desiredCapabilities.setCapability(MobileCapabilityType.ORIENTATION, screenOrientation);
-		//desiredCapabilities.setCapability("orientation", screenOrientation);
-		//desiredCapabilities.setCapability("deviceorientation", screenOrientation);
 		
 		switch(platform) {
 		case ANDROID:
@@ -67,6 +56,28 @@ public class AppiumWebDriverFactory {
 		default:
 			throw new AutopiaException("Unsupported Appium platform!");
 		}
+	}
+	
+	private static DesiredCapabilities getAppiumDesiredCapabilities(String deviceName, Browser browser,
+			Platform platform) {
+		if(!browser.toString().contains("APPIUM")) {
+			throw new AutopiaException("The browser " + browser.toString() +
+														" is not supported by Appium");
+		}
+		
+		DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+		
+		//desiredCapabilities.setCapability("deviceName", deviceName);
+		desiredCapabilities.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
+		desiredCapabilities.setCapability(MobileCapabilityType.BROWSER_NAME, browser.getValue());
+		String platformName = getAppiumPlatformName(platform);
+		desiredCapabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, platformName);
+		
+		// The capabilities below only work with emulators/simulators
+		//desiredCapabilities.setCapability(MobileCapabilityType.ORIENTATION, screenOrientation);
+		//desiredCapabilities.setCapability("orientation", screenOrientation);
+		//desiredCapabilities.setCapability("deviceorientation", screenOrientation);
+		return desiredCapabilities;
 	}
 	
 	private static String getAppiumPlatformName(Platform platform) {
