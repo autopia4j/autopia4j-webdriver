@@ -87,16 +87,16 @@ public class WebDriverFactory {
 			driver = getChromeDriver();
 			break;
 			
+		case CHROME_HEADLESS:
+			driver = getChromeHeadlessDriver();
+			break;
+			
 		case EDGE:
 			driver = getEdgeDriver();
 			break;
 			
 		case FIREFOX:
 			driver = getGeckoDriver();
-			break;
-			
-		case FIREFOX_LEGACY:
-			driver = getFirefoxLegacyDriver();
 			break;
 			
 		case GHOST_DRIVER:
@@ -140,6 +140,23 @@ public class WebDriverFactory {
 		return new ChromeDriver(desiredCapabilities);
 	}
 	
+	private static WebDriver getChromeHeadlessDriver() {
+		// Takes the system proxy settings automatically
+		
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments("headless");
+        options.addArguments("window-size=1200x600");	// Seems to be required
+        //options.addArguments("disable-gpu");	// Does not seem to be required anymore
+        //options.addArguments("remote-debugging-port=9222");	// Does not work
+        
+		DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
+		desiredCapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, acceptAllSslCertificates);
+		desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
+		
+		ChromeDriverManager.getInstance().setup();
+		return new ChromeDriver(desiredCapabilities);
+	}
+	
 	private static WebDriver getEdgeDriver() {
 		// Takes the system proxy settings automatically
 		
@@ -162,18 +179,6 @@ public class WebDriverFactory {
 		desiredCapabilities.setCapability(FirefoxDriver.PROFILE, marionetteProfile);
 		
 		return new FirefoxDriver(desiredCapabilities);
-	}
-	
-	private static WebDriver getFirefoxLegacyDriver() {
-		// Takes the system proxy settings automatically
-		
-		// Sample code to specify path of Firefox binaries
-		//System.setProperty("webdriver.firefox.bin",
-		//		"C:\\Users\\vramas\\AppData\\Local\\Mozilla Firefox\\firefox.exe");
-		
-		FirefoxProfile firefoxProfile = new FirefoxProfile();
-		firefoxProfile.setAcceptUntrustedCertificates(acceptAllSslCertificates);
-		return new FirefoxDriver(firefoxProfile);
 	}
 	
 	private static WebDriver getPhantomJsDriver() {
